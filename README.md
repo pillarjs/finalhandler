@@ -30,6 +30,12 @@ be written out to the `res`, and `res.statusCode` is set from `err.status`.
 By default, the environment is determined by `NODE_ENV` variable, but it can be
 overridden by this option.
 
+#### options.onerror
+
+Provide a function to be called with the `err` when it exists. Can be used for
+writing errors to a central location without excessive function generation. Called
+as `onerror(err, req, res)`.
+
 ## Examples
 
 ### always 404
@@ -74,7 +80,7 @@ var fs = require('fs')
 var http = require('http')
 
 var server = http.createServer(function (req, res) {
-  var done = logerror(finalhandler(req, res))
+  var done = finalhandler(req, res, {onerror: logerror})
 
   fs.readFile('index.html', function (err, buf) {
     if (err) return done(err)
@@ -85,14 +91,8 @@ var server = http.createServer(function (req, res) {
 
 server.listen(3000)
 
-function logerror(fn) {
-  return function(err) {
-    if (err) {
-      console.error(err.stack || err.toString())
-    }
-
-    fn(err)
-  }
+function logerror(err) {
+  console.error(err.stack || err.toString())
 }
 ```
 

@@ -2,6 +2,7 @@
 var finalhandler = require('..')
 var http = require('http')
 var request = require('supertest')
+var should = require('should')
 
 describe('finalhandler(req, res)', function () {
   describe('status code', function () {
@@ -117,6 +118,22 @@ describe('finalhandler(req, res)', function () {
       request(server)
       .get('/foo')
       .expect(301, '0', done)
+    })
+  })
+
+  describe('onerror', function () {
+    it('should be invoked when error', function (done) {
+      var err = new Error('boom!')
+      var error
+      var log = function (e) { error = e }
+      var server = createServer(err, {onerror: log})
+
+      request(server)
+      .get('/')
+      .end(function () {
+        should(error).equal(err)
+        done()
+      })
     })
   })
 })

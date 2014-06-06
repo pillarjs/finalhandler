@@ -13,6 +13,15 @@ var escapeHtml = require('escape-html')
 var http = require('http')
 
 /**
+ * Variables.
+ */
+
+/* istanbul ignore next */
+var defer = typeof setImmediate === 'function'
+  ? setImmediate
+  : function(fn){ process.nextTick(fn.bind.apply(fn, arguments)) }
+
+/**
  * Module exports.
  */
 
@@ -33,6 +42,9 @@ function finalhandler(req, res, options) {
 
   // get environment
   var env = options.env || process.env.NODE_ENV || 'development'
+
+  // get error callback
+  var onerror = options.onerror
 
   return function (err) {
     var msg
@@ -62,6 +74,11 @@ function finalhandler(req, res, options) {
     }
 
     debug('default %s', res.statusCode)
+
+    // schedule onerror callback
+    if (err && onerror) {
+      defer(onerror, err, req, res)
+    }
 
     // cannot actually respond
     if (res._header) {
