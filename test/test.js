@@ -64,7 +64,7 @@ describe('finalhandler(req, res)', function () {
       var server = createServer('lame string')
       request(server)
       .get('/foo')
-      .expect(500, 'lame string', done)
+      .expect(500, 'lame string\n', done)
     })
   })
 

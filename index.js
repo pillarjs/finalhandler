@@ -55,7 +55,7 @@ function finalhandler(req, res, options) {
         : err.stack || err.toString()
       msg = escapeHtml(msg)
         .replace(/\n/g, '<br>')
-        .replace(/  /g, ' &nbsp;')
+        .replace(/  /g, ' &nbsp;') + '\n'
 
       // log to stderr in a non-test env
       if (env !== 'test') {
