@@ -56,11 +56,6 @@ function finalhandler(req, res, options) {
       msg = escapeHtml(msg)
         .replace(/\n/g, '<br>')
         .replace(/  /g, ' &nbsp;') + '\n'
-
-      // log to stderr in a non-test env
-      if (env !== 'test') {
-        console.error(err.stack || err.toString())
-      }
     } else {
       res.statusCode = 404
       msg = 'Cannot ' + escapeHtml(req.method) + ' ' + escapeHtml(req.originalUrl || req.url) + '\n'

@@ -66,6 +66,36 @@ var server = http.createServer(function (req, res) {
 server.listen(3000)
 ```
 
+### keep log of all errors
+
+```js
+var finalhandler = require('finalhandler')
+var fs = require('fs')
+var http = require('http')
+
+var server = http.createServer(function (req, res) {
+  var done = logerror(finalhandler(req, res))
+
+  fs.readFile('index.html', function (err, buf) {
+    if (err) return done(err)
+    res.setHeader('Content-Type', 'text/html')
+    res.end(buf)
+  })
+})
+
+server.listen(3000)
+
+function logerror(fn) {
+  return function(err) {
+    if (err) {
+      console.error(err.stack || err.toString())
+    }
+
+    fn(err)
+  }
+}
+```
+
 ## License
 
 The MIT License (MIT)

@@ -67,10 +67,19 @@ describe('finalhandler(req, res)', function () {
       .expect(500, 'lame string\n', done)
     })
 
+    it('should send staus code name when production', function (done) {
+      var err = new Error('boom!')
+      err.status = 501
+      var server = createServer(err, {env: 'production'})
+      request(server)
+      .get('/foo')
+      .expect(501, 'Not Implemented\n', done)
+    })
+
     describe('when res.statusCode set', function () {
       it('should keep when > 400', function (done) {
         var server = http.createServer(function (req, res) {
-          var done = finalhandler(req, res, {env: 'test'})
+          var done = finalhandler(req, res)
           res.statusCode = 503
           done(new Error('oops'))
         })
@@ -82,7 +91,7 @@ describe('finalhandler(req, res)', function () {
 
       it('should override with err.status', function (done) {
         var server = http.createServer(function (req, res) {
-          var done = finalhandler(req, res, {env: 'test'})
+          var done = finalhandler(req, res)
           var err = new Error('oops')
           res.statusCode = 503
           err.status = 414
@@ -99,7 +108,7 @@ describe('finalhandler(req, res)', function () {
   describe('request started', function () {
     it('should not respond', function (done) {
       var server = http.createServer(function (req, res) {
-        var done = finalhandler(req, res, {env: 'test'})
+        var done = finalhandler(req, res)
         res.statusCode = 301
         res.write('0')
         process.nextTick(done)
@@ -112,9 +121,9 @@ describe('finalhandler(req, res)', function () {
   })
 })
 
-function createServer(err) {
+function createServer(err, opts) {
   return http.createServer(function (req, res) {
-    var done = finalhandler(req, res, {env: 'test'})
+    var done = finalhandler(req, res, opts)
     done(err)
   })
 }
