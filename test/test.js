@@ -66,6 +66,34 @@ describe('finalhandler(req, res)', function () {
       .get('/foo')
       .expect(500, 'lame string\n', done)
     })
+
+    describe('when res.statusCode set', function () {
+      it('should keep when > 400', function (done) {
+        var server = http.createServer(function (req, res) {
+          var done = finalhandler(req, res, {env: 'test'})
+          res.statusCode = 503
+          done(new Error('oops'))
+        })
+
+        request(server)
+        .get('/foo')
+        .expect(503, done)
+      })
+
+      it('should override with err.status', function (done) {
+        var server = http.createServer(function (req, res) {
+          var done = finalhandler(req, res, {env: 'test'})
+          var err = new Error('oops')
+          res.statusCode = 503
+          err.status = 414
+          done(err)
+        })
+
+        request(server)
+        .get('/foo')
+        .expect(414, done)
+      })
+    })
   })
 
   describe('request started', function () {
