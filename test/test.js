@@ -104,6 +104,20 @@ describe('finalhandler(req, res)', function () {
         .expect(414, done)
       })
     })
+
+    describe('when res.statusCode undefined', function () {
+      it('should set to 500', function (done) {
+        var server = http.createServer(function (req, res) {
+          var done = finalhandler(req, res)
+          res.statusCode = undefined
+          done(new Error('oops'))
+        })
+
+        request(server)
+        .get('/foo')
+        .expect(500, done)
+      })
+    })
   })
 
   describe('request started', function () {

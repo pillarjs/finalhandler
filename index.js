@@ -52,7 +52,7 @@ function finalhandler(req, res, options) {
     // unhandled error
     if (err) {
       // default status code to 500
-      if (res.statusCode < 400) {
+      if (!res.statusCode || res.statusCode < 400) {
         res.statusCode = 500
       }
 

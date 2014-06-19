@@ -1,3 +1,8 @@
+unreleased
+==========
+
+  * Handle invalid status codes
+
 0.0.1 / 2014-06-05
 ==================
 
