@@ -56,8 +56,8 @@ function finalhandler(req, res, options) {
         res.statusCode = 500
       }
 
-      // respect err.status
-      if (err.status) {
+      // respect err.status where applicable
+      if (err.status >= 400) {
         res.statusCode = err.status
       }
 
