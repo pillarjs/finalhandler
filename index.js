@@ -85,6 +85,10 @@ function finalhandler(req, res, options) {
       return req.socket.destroy()
     }
 
+    // security header for content sniffing
+    res.setHeader('X-Content-Type-Options', 'nosniff')
+
+    // standard headers
     res.setHeader('Content-Type', 'text/html; charset=utf-8')
     res.setHeader('Content-Length', Buffer.byteLength(msg, 'utf8'))
 

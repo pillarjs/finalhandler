@@ -1,6 +1,7 @@
 unreleased
 ==========
 
+  * Set `X-Content-Type-Options: nosniff` header
   * deps: debug@1.0.3
     - Add support for multiple wildcards in namespaces
 

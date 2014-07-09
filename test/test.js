@@ -44,10 +44,18 @@ describe('finalhandler(req, res)', function () {
       .head('/foo')
       .expect(404, '', done)
     })
+
+    it('should include security header', function (done) {
+      var server = createServer()
+      request(server)
+      .get('/foo')
+      .expect('X-Content-Type-Options', 'nosniff')
+      .expect(404, done)
+    })
   })
 
   describe('error response', function () {
-    it('include error stack', function (done) {
+    it('should include error stack', function (done) {
       var server = createServer(new Error('boom!'))
       request(server)
       .get('/foo')
@@ -59,6 +67,14 @@ describe('finalhandler(req, res)', function () {
       request(server)
       .head('/foo')
       .expect(404, '', done)
+    })
+
+    it('should include security header', function (done) {
+      var server = createServer(new Error('boom!'))
+      request(server)
+      .get('/foo')
+      .expect('X-Content-Type-Options', 'nosniff')
+      .expect(500, done)
     })
 
     it('should handle non-error-objects', function (done) {
