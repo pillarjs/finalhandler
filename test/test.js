@@ -31,11 +31,19 @@ describe('finalhandler(req, res)', function () {
   })
 
   describe('404 response', function () {
-    it('include method and path', function (done) {
+    it('should respond with HTML', function (done) {
       var server = createServer()
       request(server)
       .get('/foo')
-      .expect(404, 'Cannot GET /foo\n', done)
+      .expect('Content-Type', 'text/html; charset=utf-8')
+      .expect(404, /<html/, done)
+    })
+
+    it('should include method and path', function (done) {
+      var server = createServer()
+      request(server)
+      .get('/foo')
+      .expect(404, /Cannot GET \/foo/, done)
     })
 
     it('should handle HEAD', function (done) {
@@ -55,18 +63,26 @@ describe('finalhandler(req, res)', function () {
   })
 
   describe('error response', function () {
+    it('should respond with HTML', function (done) {
+      var server = createServer(new Error('boom!'))
+      request(server)
+      .get('/foo')
+      .expect('Content-Type', 'text/html; charset=utf-8')
+      .expect(500, /<html/, done)
+    })
+
     it('should include error stack', function (done) {
       var server = createServer(new Error('boom!'))
       request(server)
       .get('/foo')
-      .expect(500, /^Error: boom!<br> &nbsp; &nbsp;at/, done)
+      .expect(500, /Error: boom!<br> &nbsp; &nbsp;at/, done)
     })
 
     it('should handle HEAD', function (done) {
-      var server = createServer()
+      var server = createServer(new Error('boom!'))
       request(server)
       .head('/foo')
-      .expect(404, '', done)
+      .expect(500, '', done)
     })
 
     it('should include security header', function (done) {
@@ -81,7 +97,7 @@ describe('finalhandler(req, res)', function () {
       var server = createServer('lame string')
       request(server)
       .get('/foo')
-      .expect(500, 'lame string\n', done)
+      .expect(500, /lame string/, done)
     })
 
     it('should send staus code name when production', function (done) {
@@ -90,7 +106,11 @@ describe('finalhandler(req, res)', function () {
       var server = createServer(err, {env: 'production'})
       request(server)
       .get('/foo')
-      .expect(501, 'Not Implemented\n', done)
+      .expect(501, /Not Implemented/, function (err, res) {
+        if (err) return done(err)
+        should(res.text).not.match(/boom!/)
+        done()
+      })
     })
 
     describe('when res.statusCode set', function () {

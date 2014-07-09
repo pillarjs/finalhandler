@@ -47,6 +47,7 @@ function finalhandler(req, res, options) {
   var onerror = options.onerror
 
   return function (err) {
+    var body
     var msg
 
     // unhandled error
@@ -62,15 +63,12 @@ function finalhandler(req, res, options) {
       }
 
       // production gets a basic error message
-      var msg = env === 'production'
+      msg = env === 'production'
         ? http.STATUS_CODES[res.statusCode]
         : err.stack || err.toString()
-      msg = escapeHtml(msg)
-        .replace(/\n/g, '<br>')
-        .replace(/  /g, ' &nbsp;') + '\n'
     } else {
       res.statusCode = 404
-      msg = 'Cannot ' + escapeHtml(req.method) + ' ' + escapeHtml(req.originalUrl || req.url) + '\n'
+      msg = 'Cannot ' + req.method + ' ' + (req.originalUrl || req.url)
     }
 
     debug('default %s', res.statusCode)
@@ -85,18 +83,46 @@ function finalhandler(req, res, options) {
       return req.socket.destroy()
     }
 
+    // construct body
+    body = constructHtmlBody(res.statusCode, msg)
+
     // security header for content sniffing
     res.setHeader('X-Content-Type-Options', 'nosniff')
 
     // standard headers
     res.setHeader('Content-Type', 'text/html; charset=utf-8')
-    res.setHeader('Content-Length', Buffer.byteLength(msg, 'utf8'))
+    res.setHeader('Content-Length', Buffer.byteLength(body, 'utf8'))
 
     if (req.method === 'HEAD') {
       res.end()
       return
     }
 
-    res.end(msg, 'utf8')
+    res.end(body, 'utf8')
   }
+}
+
+/**
+ * Get HTML body string
+ *
+ * @param {number} status
+ * @param {string} message
+ * @return {string}
+ * @api private
+ */
+
+function constructHtmlBody(status, message) {
+  var msg = escapeHtml(message)
+    .replace(/\n/g, '<br>')
+    .replace(/  /g, ' &nbsp;')
+
+  return '<!doctype html>\n'
+    + '<html lang=en>\n'
+    + '<head>\n'
+    + '<meta charset=utf-8>\n'
+    + '<title>' + escapeHtml(http.STATUS_CODES[status]) + '</title>\n'
+    + '</head>\n'
+    + '<body>\n'
+    + msg + '\n'
+    + '</body>\n'
 }
