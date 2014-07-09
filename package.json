@@ -6,7 +6,7 @@
   "license": "MIT",
   "repository": "expressjs/finalhandler",
   "dependencies": {
-    "debug": "1.0.2",
+    "debug": "1.0.3",
     "escape-html": "1.0.1"
   },
   "devDependencies": {
