@@ -8,6 +8,7 @@
  * Module dependencies.
  */
 
+var accepts = require('accepts')
 var debug = require('debug')('finalhandler')
 var escapeHtml = require('escape-html')
 var http = require('http')
@@ -48,6 +49,7 @@ function finalhandler(req, res, options) {
 
   return function (err) {
     var body
+    var constructBody
     var msg
 
     // unhandled error
@@ -83,22 +85,37 @@ function finalhandler(req, res, options) {
       return req.socket.destroy()
     }
 
+    // negotiate
+    var accept = accepts(req)
+    var type = accept.types('html', 'text')
+
     // construct body
-    body = constructHtmlBody(res.statusCode, msg)
+    switch (type) {
+      case 'html':
+        constructBody = constructHtmlBody
+        break
+      default:
+        // default to plain text
+        constructBody = constructTextBody
+        break
+    }
+
+    // construct body
+    body = constructBody(res.statusCode, msg)
 
     // security header for content sniffing
     res.setHeader('X-Content-Type-Options', 'nosniff')
 
     // standard headers
-    res.setHeader('Content-Type', 'text/html; charset=utf-8')
-    res.setHeader('Content-Length', Buffer.byteLength(body, 'utf8'))
+    res.setHeader('Content-Type', body.type)
+    res.setHeader('Content-Length', body.length)
 
     if (req.method === 'HEAD') {
       res.end()
       return
     }
 
-    res.end(body, 'utf8')
+    res.end(body)
   }
 }
 
@@ -116,7 +133,7 @@ function constructHtmlBody(status, message) {
     .replace(/\n/g, '<br>')
     .replace(/  /g, ' &nbsp;')
 
-  return '<!doctype html>\n'
+  var html = '<!doctype html>\n'
     + '<html lang=en>\n'
     + '<head>\n'
     + '<meta charset=utf-8>\n'
@@ -125,4 +142,32 @@ function constructHtmlBody(status, message) {
     + '<body>\n'
     + msg + '\n'
     + '</body>\n'
+
+  var body = new Buffer(html, 'utf8')
+
+  body.type = 'text/html; charset=utf-8'
+
+  return body
 }
+
+constructHtmlBody.type = 'text/html; charset=utf-8'
+
+/**
+ * Get plain text body string
+ *
+ * @param {number} status
+ * @param {string} message
+ * @return {Buffer}
+ * @api private
+ */
+
+function constructTextBody(status, message) {
+  var msg = message + '\n'
+  var body = new Buffer(msg, 'utf8')
+
+  body.type = 'text/plain; charset=utf-8'
+
+  return body
+}
+
+constructTextBody.type = 'text/plain; charset=utf-8'

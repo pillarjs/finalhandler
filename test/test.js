@@ -31,14 +31,6 @@ describe('finalhandler(req, res)', function () {
   })
 
   describe('404 response', function () {
-    it('should respond with HTML', function (done) {
-      var server = createServer()
-      request(server)
-      .get('/foo')
-      .expect('Content-Type', 'text/html; charset=utf-8')
-      .expect(404, /<html/, done)
-    })
-
     it('should include method and path', function (done) {
       var server = createServer()
       request(server)
@@ -60,22 +52,36 @@ describe('finalhandler(req, res)', function () {
       .expect('X-Content-Type-Options', 'nosniff')
       .expect(404, done)
     })
+
+    describe('when HTML acceptable', function () {
+      it('should respond with HTML', function (done) {
+        var server = createServer()
+        request(server)
+        .get('/foo')
+        .set('Accept', 'text/html')
+        .expect('Content-Type', 'text/html; charset=utf-8')
+        .expect(404, /<html/, done)
+      })
+    })
+
+    describe('when HTML not acceptable', function () {
+      it('should respond with plain text', function (done) {
+        var server = createServer()
+        request(server)
+        .get('/foo')
+        .set('Accept', 'application/x-bogus')
+        .expect('Content-Type', 'text/plain; charset=utf-8')
+        .expect(404, 'Cannot GET /foo\n', done)
+      })
+    })
   })
 
   describe('error response', function () {
-    it('should respond with HTML', function (done) {
-      var server = createServer(new Error('boom!'))
-      request(server)
-      .get('/foo')
-      .expect('Content-Type', 'text/html; charset=utf-8')
-      .expect(500, /<html/, done)
-    })
-
     it('should include error stack', function (done) {
       var server = createServer(new Error('boom!'))
       request(server)
       .get('/foo')
-      .expect(500, /Error: boom!<br> &nbsp; &nbsp;at/, done)
+      .expect(500, /Error: boom!.*at.*:[0-9]+:[0-9]+/, done)
     })
 
     it('should handle HEAD', function (done) {
@@ -110,6 +116,36 @@ describe('finalhandler(req, res)', function () {
         if (err) return done(err)
         should(res.text).not.match(/boom!/)
         done()
+      })
+    })
+
+    describe('when HTML acceptable', function () {
+      it('should respond with HTML', function (done) {
+        var server = createServer(new Error('boom!'))
+        request(server)
+        .get('/foo')
+        .set('Accept', 'text/html')
+        .expect('Content-Type', 'text/html; charset=utf-8')
+        .expect(500, /<html/, done)
+      })
+
+      it('should escape error stack', function (done) {
+        var server = createServer(new Error('boom!'))
+        request(server)
+        .get('/foo')
+        .set('Accept', 'text/html')
+        .expect(500, /Error: boom!<br> &nbsp; &nbsp;at/, done)
+      })
+    })
+
+    describe('when HTML not acceptable', function () {
+      it('should respond with plain text', function (done) {
+        var server = createServer(new Error('boom!'))
+        request(server)
+        .get('/foo')
+        .set('Accept', 'application/x-bogus')
+        .expect('Content-Type', 'text/plain; charset=utf-8')
+        .expect(500, /Error: boom!\n    at/, done)
       })
     })
 

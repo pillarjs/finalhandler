@@ -1,6 +1,7 @@
 unreleased
 ==========
 
+  * Add `text/plain` fallback response
   * Send complete HTML document
   * Set `X-Content-Type-Options: nosniff` header
   * deps: debug@1.0.3

@@ -6,6 +6,7 @@
   "license": "MIT",
   "repository": "expressjs/finalhandler",
   "dependencies": {
+    "accepts": "1.0.7",
     "debug": "1.0.3",
     "escape-html": "1.0.1"
   },
@@ -19,7 +20,7 @@
     "node": ">= 0.8.0"
   },
   "scripts": {
-    "test": "mocha --reporter dot test/",
+    "test": "mocha --reporter spec --bail test/",
     "test-cov": "istanbul cover node_modules/mocha/bin/_mocha -- --reporter dot test/",
     "test-travis": "istanbul cover node_modules/mocha/bin/_mocha --report lcovonly -- --reporter spec test/"
   }
