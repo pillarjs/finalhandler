@@ -172,18 +172,32 @@ describe('finalhandler(req, res)', function () {
         .expect(503, done)
       })
 
-      it('should override with err.status', function (done) {
+      it('should override with err.status when err.status is greater or equal to 400', function (done) {
         var server = http.createServer(function (req, res) {
           var done = finalhandler(req, res)
           var err = new Error('oops')
           res.statusCode = 503
-          err.status = 414
+          err.status = 400
           done(err)
         })
 
         request(server)
         .get('/foo')
-        .expect(414, done)
+        .expect(400, done)
+      })
+
+      it('should not override with err.status when err.status is less than 400', function (done) {
+        var server = http.createServer(function (req, res) {
+          var done = finalhandler(req, res)
+          var err = new Error('oops')
+          res.statusCode = 503
+          err.status = 200
+          done(err)
+        })
+
+        request(server)
+        .get('/foo')
+        .expect(503, done)
       })
     })
 
@@ -232,6 +246,8 @@ describe('finalhandler(req, res)', function () {
       })
     })
   })
+
+
 })
 
 function createServer(err, opts) {
