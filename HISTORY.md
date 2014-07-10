@@ -1,7 +1,9 @@
 unreleased
 ==========
 
+  * Add `stacktrace` option
   * Add `text/plain` fallback response
+  * Remove `env` option; use `stacktrace` option instead
   * Send complete HTML document
   * Set `X-Content-Type-Options: nosniff` header
   * deps: debug@1.0.3

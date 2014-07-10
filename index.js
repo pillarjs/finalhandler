@@ -41,11 +41,11 @@ module.exports = finalhandler
 function finalhandler(req, res, options) {
   options = options || {}
 
-  // get environment
-  var env = options.env || process.env.NODE_ENV || 'development'
-
   // get error callback
   var onerror = options.onerror
+
+  // get stack trace option
+  var stacktrace = options.stacktrace || false;
 
   return function (err) {
     var body
@@ -65,9 +65,9 @@ function finalhandler(req, res, options) {
       }
 
       // production gets a basic error message
-      msg = env === 'production'
-        ? http.STATUS_CODES[res.statusCode]
-        : err.stack || err.toString()
+      msg = stacktrace
+        ? err.stack || String(err)
+        : http.STATUS_CODES[res.statusCode]
     } else {
       res.statusCode = 404
       msg = 'Cannot ' + req.method + ' ' + (req.originalUrl || req.url)
