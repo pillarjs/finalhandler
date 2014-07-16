@@ -3,6 +3,8 @@ var finalhandler = require('..')
 var http = require('http')
 var request = require('supertest')
 var should = require('should')
+var stream = require('readable-stream')
+var util = require('util')
 
 describe('finalhandler(req, res)', function () {
   describe('status code', function () {
@@ -44,6 +46,17 @@ describe('finalhandler(req, res)', function () {
       .head('/foo')
       .expect(404, '', done)
     })
+
+    it('should not hang/error if there is a request body', function (done) {
+      var buf = new Buffer(1024 * 16)
+      var server = createServer()
+      var test = request(server).post('/foo')
+      buf.fill('.')
+      test.write(buf)
+      test.write(buf)
+      test.write(buf)
+      test.expect(404, done)
+    })
   })
 
   describe('error response', function () {
@@ -75,6 +88,53 @@ describe('finalhandler(req, res)', function () {
       request(server)
       .get('/foo')
       .expect(501, 'Not Implemented\n', done)
+    })
+
+    describe('when there is a request body', function () {
+      it('should not hang/error when unread', function (done) {
+        var buf = new Buffer(1024 * 16)
+        var server = createServer(new Error('boom!'))
+        var test = request(server).post('/foo')
+        buf.fill('.')
+        test.write(buf)
+        test.write(buf)
+        test.write(buf)
+        test.expect(500, done)
+      })
+
+      it('should not hang/error when actively piped', function (done) {
+        var buf = new Buffer(1024 * 16)
+        var server = createServer(function (req, res, next) {
+          req.pipe(stream)
+          process.nextTick(function () {
+            next(new Error('boom!'))
+          })
+        })
+        var stream = createSlowWriteStream()
+        var test = request(server).post('/foo')
+        buf.fill('.')
+        test.write(buf)
+        test.write(buf)
+        test.write(buf)
+        test.expect(500, done)
+      })
+
+      it('should not hang/error when read', function (done) {
+        var buf = new Buffer(1024 * 16)
+        var server = createServer(function (req, res, next) {
+          // read off the request
+          req.once('end', function () {
+            next(new Error('boom!'))
+          })
+          req.resume()
+        })
+        var test = request(server).post('/foo')
+        buf.fill('.')
+        test.write(buf)
+        test.write(buf)
+        test.write(buf)
+        test.expect(500, done)
+      })
     })
 
     describe('when res.statusCode set', function () {
@@ -155,6 +215,26 @@ describe('finalhandler(req, res)', function () {
 function createServer(err, opts) {
   return http.createServer(function (req, res) {
     var done = finalhandler(req, res, opts)
+
+    if (typeof err === 'function') {
+      err(req, res, done)
+      return
+    }
+
     done(err)
   })
+}
+
+function createSlowWriteStream() {
+  return new SlowWriteStream()
+}
+
+function SlowWriteStream() {
+  stream.Writable.call(this)
+}
+
+util.inherits(SlowWriteStream, stream.Writable)
+
+SlowWriteStream.prototype._write = function _write(chunk, encoding, callback) {
+  setTimeout(callback, 1000)
 }

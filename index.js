@@ -85,14 +85,74 @@ function finalhandler(req, res, options) {
       return req.socket.destroy()
     }
 
+    send(req, res, res.statusCode, msg)
+  }
+}
+
+/**
+ * Send response.
+ *
+ * @param {IncomingMessage} req
+ * @param {OutgoingMessage} res
+ * @param {number} status
+ * @param {string} body
+ * @api private
+ */
+
+function send(req, res, status, body) {
+  function write() {
+    res.statusCode = status
     res.setHeader('Content-Type', 'text/html; charset=utf-8')
-    res.setHeader('Content-Length', Buffer.byteLength(msg, 'utf8'))
+    res.setHeader('Content-Length', Buffer.byteLength(body, 'utf8'))
 
     if (req.method === 'HEAD') {
       res.end()
       return
     }
 
-    res.end(msg, 'utf8')
+    res.end(body, 'utf8')
+  }
+
+  if (!req.readable) {
+    write()
+    return
+  }
+
+  // unpipe everything from the request
+  unpipe(req)
+
+  // flush the request
+  req.once('end', write)
+  req.resume()
+}
+
+/**
+ * Unpipe everything from a stream.
+ *
+ * @param {Object} stream
+ * @api private
+ */
+
+/* istanbul ignore next: implementation differs between versions */
+function unpipe(stream) {
+  if (typeof stream.unpipe === 'function') {
+    // new-style
+    stream.unpipe()
+    return
+  }
+
+  // Node.js 0.8 hack
+  var listener
+  var listeners = stream.listeners('close')
+
+  for (var i = 0; i < listeners.length; i++) {
+    listener = listeners[i]
+
+    if (listener.name !== 'cleanup' && listener.name !== 'onclose') {
+      continue
+    }
+
+    // invoke the listener
+    listener.call(stream)
   }
 }

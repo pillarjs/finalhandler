@@ -25,6 +25,8 @@ This function is to be invoked as `fn(err)`. If `err` is falsy, the handler will
 write out a 404 response to the `res`. If it is truthy, an error response will
 be written out to the `res`, and `res.statusCode` is set from `err.status`.
 
+The final handler will also unpipe anything from `req` when it is invoked.
+
 #### options.env
 
 By default, the environment is determined by `NODE_ENV` variable, but it can be

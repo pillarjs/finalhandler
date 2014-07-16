@@ -1,6 +1,8 @@
 unreleased
 ==========
 
+  * Respond after request fully read
+    - prevents hung responses and socket hang ups
   * deps: debug@1.0.4
 
 0.0.3 / 2014-07-11
