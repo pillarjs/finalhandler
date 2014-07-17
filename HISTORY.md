@@ -1,5 +1,5 @@
-unreleased
-==========
+0.1.0 / 2014-07-16
+==================
 
   * Respond after request fully read
     - prevents hung responses and socket hang ups
