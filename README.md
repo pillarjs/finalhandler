@@ -2,6 +2,7 @@
 
 [![NPM Version][npm-image]][npm-url]
 [![NPM Downloads][downloads-image]][downloads-url]
+[![Node.js Version][node-image]][node-url]
 [![Build Status][travis-image]][travis-url]
 [![Test Coverage][coveralls-image]][coveralls-url]
 
@@ -122,6 +123,8 @@ function logerror(err) {
 
 [npm-image]: https://img.shields.io/npm/v/finalhandler.svg?style=flat
 [npm-url]: https://npmjs.org/package/finalhandler
+[node-image]: http://img.shields.io/badge/node.js-%3E%3D_0.8-brightgreen.svg?style=flat
+[node-url]: http://nodejs.org/download/
 [travis-image]: https://img.shields.io/travis/pillarjs/finalhandler.svg?style=flat
 [travis-url]: https://travis-ci.org/pillarjs/finalhandler
 [coveralls-image]: https://img.shields.io/coveralls/pillarjs/finalhandler.svg?style=flat
