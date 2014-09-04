@@ -1,5 +1,5 @@
-unreleased
-==========
+0.2.0 / 2014-09-03
+==================
 
   * Set `X-Content-Type-Options: nosniff` header
   * deps: debug@~2.0.0
