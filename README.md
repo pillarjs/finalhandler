@@ -1,8 +1,9 @@
 # finalhandler
 
-[![NPM version](https://badge.fury.io/js/finalhandler.svg)](https://badge.fury.io/js/finalhandler)
-[![Build Status](https://travis-ci.org/pillarjs/finalhandler.svg?branch=master)](https://travis-ci.org/pillarjs/finalhandler)
-[![Coverage Status](https://img.shields.io/coveralls/pillarjs/finalhandler.svg?branch=master)](https://coveralls.io/r/pillarjs/finalhandler)
+[![NPM Version][npm-image]][npm-url]
+[![NPM Downloads][downloads-image]][downloads-url]
+[![Build Status][travis-image]][travis-url]
+[![Test Coverage][coveralls-image]][coveralls-url]
 
 Node.js function to invoke as the final step to respond to HTTP request.
 
@@ -138,3 +139,12 @@ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
 LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
+
+[npm-image]: https://img.shields.io/npm/v/finalhandler.svg?style=flat
+[npm-url]: https://npmjs.org/package/finalhandler
+[travis-image]: https://img.shields.io/travis/pillarjs/finalhandler.svg?style=flat
+[travis-url]: https://travis-ci.org/pillarjs/finalhandler
+[coveralls-image]: https://img.shields.io/coveralls/pillarjs/finalhandler.svg?style=flat
+[coveralls-url]: https://coveralls.io/r/pillarjs/finalhandler?branch=master
+[downloads-image]: http://img.shields.io/npm/dm/finalhandler.svg?style=flat
+[downloads-url]: https://npmjs.org/package/finalhandler
