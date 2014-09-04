@@ -1,8 +1,8 @@
 # finalhandler
 
 [![NPM version](https://badge.fury.io/js/finalhandler.svg)](https://badge.fury.io/js/finalhandler)
-[![Build Status](https://travis-ci.org/expressjs/finalhandler.svg?branch=master)](https://travis-ci.org/expressjs/finalhandler)
-[![Coverage Status](https://img.shields.io/coveralls/expressjs/finalhandler.svg?branch=master)](https://coveralls.io/r/expressjs/finalhandler)
+[![Build Status](https://travis-ci.org/pillarjs/finalhandler.svg?branch=master)](https://travis-ci.org/pillarjs/finalhandler)
+[![Coverage Status](https://img.shields.io/coveralls/pillarjs/finalhandler.svg?branch=master)](https://coveralls.io/r/pillarjs/finalhandler)
 
 Node.js function to invoke as the final step to respond to HTTP request.
 

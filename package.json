@@ -4,7 +4,7 @@
   "version": "0.1.0",
   "author": "Douglas Christopher Wilson <doug@somethingdoug.com>",
   "license": "MIT",
-  "repository": "expressjs/finalhandler",
+  "repository": "pillarjs/finalhandler",
   "dependencies": {
     "debug": "1.0.4",
     "escape-html": "1.0.1"
