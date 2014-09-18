@@ -129,5 +129,5 @@ function logerror(err) {
 [travis-url]: https://travis-ci.org/pillarjs/finalhandler
 [coveralls-image]: https://img.shields.io/coveralls/pillarjs/finalhandler.svg?style=flat
 [coveralls-url]: https://coveralls.io/r/pillarjs/finalhandler?branch=master
-[downloads-image]: http://img.shields.io/npm/dm/finalhandler.svg?style=flat
+[downloads-image]: https://img.shields.io/npm/dm/finalhandler.svg?style=flat
 [downloads-url]: https://npmjs.org/package/finalhandler
