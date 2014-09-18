@@ -123,7 +123,7 @@ function logerror(err) {
 
 [npm-image]: https://img.shields.io/npm/v/finalhandler.svg?style=flat
 [npm-url]: https://npmjs.org/package/finalhandler
-[node-image]: http://img.shields.io/badge/node.js-%3E%3D_0.8-brightgreen.svg?style=flat
+[node-image]: https://img.shields.io/node/v/finalhandler.svg?style=flat
 [node-url]: http://nodejs.org/download/
 [travis-image]: https://img.shields.io/travis/pillarjs/finalhandler.svg?style=flat
 [travis-url]: https://travis-ci.org/pillarjs/finalhandler
