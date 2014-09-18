@@ -10,7 +10,7 @@
     "escape-html": "1.0.1"
   },
   "devDependencies": {
-    "istanbul": "0.3.0",
+    "istanbul": "0.3.2",
     "mocha": "~1.21.4",
     "readable-stream": "~1.0.27",
     "should": "~4.0.1",
