@@ -202,7 +202,26 @@ describe('finalhandler(req, res)', function () {
         var done = finalhandler(req, res)
         res.statusCode = 301
         res.write('0')
-        process.nextTick(done)
+        process.nextTick(function () {
+          done()
+          res.end('1')
+        })
+      })
+
+      request(server)
+      .get('/foo')
+      .expect(301, '01', done)
+    })
+
+    it('should terminate on error', function (done) {
+      var server = http.createServer(function (req, res) {
+        var done = finalhandler(req, res)
+        res.statusCode = 301
+        res.write('0')
+        process.nextTick(function () {
+          done(new Error('boom!'))
+          res.end('1')
+        })
       })
 
       request(server)

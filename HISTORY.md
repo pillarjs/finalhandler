@@ -1,6 +1,7 @@
 unreleased
 ==========
 
+  * Terminate in progress response only on error
   * Use `on-finished` to determine request status
 
 0.2.0 / 2014-09-03

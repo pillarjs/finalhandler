@@ -51,6 +51,12 @@ function finalhandler(req, res, options) {
   return function (err) {
     var msg
 
+    // ignore 404 on in-flight response
+    if (!err && res._header) {
+      debug('cannot 404 after headers sent')
+      return
+    }
+
     // unhandled error
     if (err) {
       // default status code to 500
