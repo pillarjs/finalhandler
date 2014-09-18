@@ -11,6 +11,7 @@
 var debug = require('debug')('finalhandler')
 var escapeHtml = require('escape-html')
 var http = require('http')
+var onFinished = require('on-finished')
 
 /**
  * Variables.
@@ -20,6 +21,7 @@ var http = require('http')
 var defer = typeof setImmediate === 'function'
   ? setImmediate
   : function(fn){ process.nextTick(fn.bind.apply(fn, arguments)) }
+var isFinished = onFinished.isFinished
 
 /**
  * Module exports.
@@ -118,7 +120,7 @@ function send(req, res, status, body) {
     res.end(body, 'utf8')
   }
 
-  if (!req.readable) {
+  if (isFinished(req)) {
     write()
     return
   }
@@ -127,7 +129,7 @@ function send(req, res, status, body) {
   unpipe(req)
 
   // flush the request
-  req.once('end', write)
+  onFinished(req, write)
   req.resume()
 }
 
