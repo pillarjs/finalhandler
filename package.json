@@ -13,7 +13,7 @@
   "devDependencies": {
     "istanbul": "0.3.2",
     "mocha": "~1.21.4",
-    "readable-stream": "~1.0.27",
+    "readable-stream": "~1.0.33",
     "should": "~4.0.1",
     "supertest": "~0.13.0"
   },
