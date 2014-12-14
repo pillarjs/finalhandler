@@ -1,8 +1,8 @@
 
+var assert = require('assert')
 var finalhandler = require('..')
 var http = require('http')
 var request = require('supertest')
-var should = require('should')
 var stream = require('readable-stream')
 var util = require('util')
 
@@ -240,7 +240,7 @@ describe('finalhandler(req, res)', function () {
       request(server)
       .get('/')
       .end(function () {
-        should(error).equal(err)
+        assert.equal(error, err)
         done()
       })
     })
