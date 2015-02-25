@@ -8,7 +8,6 @@
  * Module dependencies.
  */
 
-var debug = require('debug')('finalhandler')
 var escapeHtml = require('escape-html')
 var http = require('http')
 var onFinished = require('on-finished')
@@ -53,7 +52,6 @@ function finalhandler(req, res, options) {
 
     // ignore 404 on in-flight response
     if (!err && res._header) {
-      debug('cannot 404 after headers sent')
       return
     }
 
@@ -80,8 +78,6 @@ function finalhandler(req, res, options) {
       res.statusCode = 404
       msg = 'Cannot ' + escapeHtml(req.method) + ' ' + escapeHtml(req.originalUrl || req.url) + '\n'
     }
-
-    debug('default %s', res.statusCode)
 
     // schedule onerror callback
     if (err && onerror) {
