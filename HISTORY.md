@@ -3,6 +3,10 @@ unreleased
 
   * Fix a false-positive when unpiping in Node.js 0.8
   * deps: escape-html@1.0.2
+  * deps: on-finished@~2.3.0
+    - Add defined behavior for HTTP `CONNECT` requests
+    - Add defined behavior for HTTP `Upgrade` requests
+    - deps: ee-first@1.1.1
 
 0.3.6 / 2015-05-11
 ==================
