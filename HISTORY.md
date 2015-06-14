@@ -2,6 +2,7 @@ unreleased
 ==========
 
   * Fix a false-positive when unpiping in Node.js 0.8
+  * Use `unpipe` module for unpiping requests
   * deps: escape-html@1.0.2
   * deps: on-finished@~2.3.0
     - Add defined behavior for HTTP `CONNECT` requests

@@ -13,6 +13,7 @@ var debug = require('debug')('finalhandler')
 var escapeHtml = require('escape-html')
 var http = require('http')
 var onFinished = require('on-finished')
+var unpipe = require('unpipe')
 
 /**
  * Module variables.
@@ -101,24 +102,6 @@ function finalhandler(req, res, options) {
 }
 
 /**
- * Determine if there are Node.js pipe-like data listeners.
- * @private
- */
-
-/* istanbul ignore next: implementation differs between versions */
-function hasPipeDataListeners(stream) {
-  var listeners = stream.listeners('data')
-
-  for (var i = 0; i < listeners.length; i++) {
-    if (listeners[i].name === 'ondata') {
-      return true
-    }
-  }
-
-  return false
-}
-
-/**
  * Send response.
  *
  * @param {IncomingMessage} req
@@ -158,39 +141,4 @@ function send(req, res, status, body) {
   // flush the request
   onFinished(req, write)
   req.resume()
-}
-
-/**
- * Unpipe everything from a stream.
- *
- * @param {Object} stream
- * @private
- */
-
-/* istanbul ignore next: implementation differs between versions */
-function unpipe(stream) {
-  if (typeof stream.unpipe === 'function') {
-    // new-style
-    stream.unpipe()
-    return
-  }
-
-  // Node.js 0.8 hack
-  if (!hasPipeDataListeners(stream)) {
-    return
-  }
-
-  var listener
-  var listeners = stream.listeners('close')
-
-  for (var i = 0; i < listeners.length; i++) {
-    listener = listeners[i]
-
-    if (listener.name !== 'cleanup' && listener.name !== 'onclose') {
-      continue
-    }
-
-    // invoke the listener
-    listener.call(stream)
-  }
 }
