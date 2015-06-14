@@ -36,7 +36,7 @@ var isFinished = onFinished.isFinished
 module.exports = finalhandler
 
 /**
- * Final handler:
+ * Create a function to handle the final response.
  *
  * @param {Request} req
  * @param {Response} res
@@ -46,13 +46,13 @@ module.exports = finalhandler
  */
 
 function finalhandler(req, res, options) {
-  options = options || {}
+  var opts = options || {}
 
   // get environment
-  var env = options.env || process.env.NODE_ENV || 'development'
+  var env = opts.env || process.env.NODE_ENV || 'development'
 
   // get error callback
-  var onerror = options.onerror
+  var onerror = opts.onerror
 
   return function (err) {
     var msg
