@@ -7,7 +7,7 @@
   "repository": "pillarjs/finalhandler",
   "dependencies": {
     "debug": "~2.2.0",
-    "escape-html": "1.0.1",
+    "escape-html": "1.0.2",
     "on-finished": "~2.2.1"
   },
   "devDependencies": {
