@@ -1,5 +1,5 @@
-unreleased
-==========
+0.4.0 / 2015-06-14
+==================
 
   * Fix a false-positive when unpiping in Node.js 0.8
   * Support `statusCode` property on `Error` objects
