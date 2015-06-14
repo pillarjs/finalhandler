@@ -14,7 +14,7 @@
     "istanbul": "0.3.15",
     "mocha": "~2.2.4",
     "readable-stream": "~1.0.33",
-    "supertest": "~0.15.0"
+    "supertest": "1.0.1"
   },
   "files": [
     "LICENSE",
