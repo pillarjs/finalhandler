@@ -1,6 +1,7 @@
 unreleased
 ==========
 
+  * Fix a false-positive when unpiping in Node.js 0.8
   * deps: escape-html@1.0.2
 
 0.3.6 / 2015-05-11
