@@ -55,7 +55,7 @@ function finalhandler(req, res, options) {
   var onerror = opts.onerror
 
   return function (err) {
-    var msg
+    var status = res.statusCode
 
     // ignore 404 on in-flight response
     if (!err && res._header) {
@@ -65,29 +65,34 @@ function finalhandler(req, res, options) {
 
     // unhandled error
     if (err) {
-      // default status code to 500
-      if (!res.statusCode || res.statusCode < 400) {
-        res.statusCode = 500
+      // respect err.statusCode
+      if (err.statusCode) {
+        status = err.statusCode
       }
 
       // respect err.status
       if (err.status) {
-        res.statusCode = err.status
+        status = err.status
+      }
+
+      // default status code to 500
+      if (!status || status < 400) {
+        status = 500
       }
 
       // production gets a basic error message
       var msg = env === 'production'
-        ? http.STATUS_CODES[res.statusCode]
+        ? http.STATUS_CODES[status]
         : err.stack || err.toString()
       msg = escapeHtml(msg)
         .replace(/\n/g, '<br>')
         .replace(/  /g, ' &nbsp;') + '\n'
     } else {
-      res.statusCode = 404
+      status = 404
       msg = 'Cannot ' + escapeHtml(req.method) + ' ' + escapeHtml(req.originalUrl || req.url) + '\n'
     }
 
-    debug('default %s', res.statusCode)
+    debug('default %s', status)
 
     // schedule onerror callback
     if (err && onerror) {
@@ -99,7 +104,7 @@ function finalhandler(req, res, options) {
       return req.socket.destroy()
     }
 
-    send(req, res, res.statusCode, msg)
+    send(req, res, status, msg)
   }
 }
 

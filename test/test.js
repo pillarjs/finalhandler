@@ -22,9 +22,28 @@ describe('finalhandler(req, res)', function () {
       .expect(500, done)
     })
 
+    it('should use err.statusCode', function (done) {
+      var err = new Error()
+      err.statusCode = 400
+      var server = createServer(err)
+      request(server)
+      .get('/')
+      .expect(400, done)
+    })
+
     it('should use err.status', function (done) {
       var err = new Error()
       err.status = 400
+      var server = createServer(err)
+      request(server)
+      .get('/')
+      .expect(400, done)
+    })
+
+    it('should use err.status over err.statusCode', function (done) {
+      var err = new Error()
+      err.status = 400
+      err.statusCode = 401
       var server = createServer(err)
       request(server)
       .get('/')
