@@ -6,6 +6,7 @@
 
 /**
  * Module dependencies.
+ * @private
  */
 
 var debug = require('debug')('finalhandler')
@@ -14,7 +15,8 @@ var http = require('http')
 var onFinished = require('on-finished')
 
 /**
- * Variables.
+ * Module variables.
+ * @private
  */
 
 /* istanbul ignore next */
@@ -25,6 +27,7 @@ var isFinished = onFinished.isFinished
 
 /**
  * Module exports.
+ * @public
  */
 
 module.exports = finalhandler
@@ -36,7 +39,7 @@ module.exports = finalhandler
  * @param {Response} res
  * @param {Object} [options]
  * @return {Function}
- * @api public
+ * @public
  */
 
 function finalhandler(req, res, options) {
@@ -104,7 +107,7 @@ function finalhandler(req, res, options) {
  * @param {OutgoingMessage} res
  * @param {number} status
  * @param {string} body
- * @api private
+ * @private
  */
 
 function send(req, res, status, body) {
@@ -143,7 +146,7 @@ function send(req, res, status, body) {
  * Unpipe everything from a stream.
  *
  * @param {Object} stream
- * @api private
+ * @private
  */
 
 /* istanbul ignore next: implementation differs between versions */
