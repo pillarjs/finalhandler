@@ -7,6 +7,7 @@
 [![Test Coverage][coveralls-image]][coveralls-url]
 
 Node.js function to invoke as the final step to respond to HTTP request.
+***Note:*** This is a fork maintained by [@gtomitsuka](https://github.com/gtomitsuka), and includes a `render` option, for custom rendering.
 
 ## Installation
 
@@ -39,6 +40,10 @@ overridden by this option.
 Provide a function to be called with the `err` when it exists. Can be used for
 writing errors to a central location without excessive function generation. Called
 as `onerror(err, req, res)`.
+
+#### options.render
+
+Provide a function to be called for custom error message display. Called as `render(msg, req, res, done)`.
 
 ## Examples
 
@@ -115,6 +120,25 @@ server.listen(3000)
 function logerror(err) {
   console.error(err.stack || err.toString())
 }
+```
+
+### render custom view on error
+```js
+var finalhandler = require('finalhandler')
+
+var server = http.createServer(function (req, res) {
+  var done = finalhandler(req, res, {render: function(msg, req, res, done){
+    done(ejs.renderFile(__dirname + '/views/error.ejs', {msg: msg}))
+  }})
+
+  fs.readFile('index.html', function (err, buf) {
+    if (err) return done(err)
+    res.setHeader('Content-Type', 'text/html')
+    res.end(buf)
+  })
+})
+
+server.listen(3000)
 ```
 
 ## License
