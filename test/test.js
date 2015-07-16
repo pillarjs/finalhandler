@@ -264,6 +264,17 @@ describe('finalhandler(req, res)', function () {
       })
     })
   })
+  
+  describe('custom error view', function(){
+    it('should render a custom view when option is set', function(done){
+      var server = createServer(undefined, {render: function(message, res, done){
+        done('<!DOCTYPE html><html><body><p>' + message + '<p></body></html>')
+      }})
+      request(server)
+      .get('/')
+      .expect(new RegExp("^<!DOCTYPE html>", "i"), done)
+    })
+  })
 })
 
 function createServer(err, opts) {
