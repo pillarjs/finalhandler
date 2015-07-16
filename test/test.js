@@ -269,8 +269,8 @@ describe('finalhandler(req, res)', function () {
     it('should render a custom view when option is set', function(done){
       var err = new Error('boom!')
       
-      var server = createServer(err, {render: function(msg, req, res, serverDone){
-        serverDone('<!DOCTYPE html><html><body><p>' + msg + '<p></body></html>')
+      var server = createServer(err, {render: function(msg, req, res, finished){
+        finished('<!DOCTYPE html><html><body><p>' + msg + '<p></body></html>')
       }})
       request(server)
       .get('/')
