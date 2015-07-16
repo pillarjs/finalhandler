@@ -54,6 +54,8 @@ function finalhandler(req, res, options) {
   // get error callback
   var onerror = opts.onerror
 
+  var render = opts.render
+
   return function (err) {
     var status = res.statusCode
 
@@ -104,7 +106,12 @@ function finalhandler(req, res, options) {
       return req.socket.destroy()
     }
 
-    send(req, res, status, msg)
+    if(typeof render === 'function'){
+      render(msg, function(rendered){
+        send(req, res, status, rendered)
+      });
+    }else
+      send(req, res, status, mst)
   }
 }
 
