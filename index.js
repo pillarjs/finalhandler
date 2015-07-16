@@ -107,11 +107,11 @@ function finalhandler(req, res, options) {
     }
 
     if(typeof render === 'function'){
-      render(res, msg, function(rendered){
+      render(msg, req, res, function(rendered){
         send(req, res, status, rendered)
       });
     }else
-      send(req, res, status, mst)
+      send(req, res, status, msg)
   }
 }
 
