@@ -29,16 +29,17 @@ be written out to the `res`, and `res.statusCode` is set from `err.status`.
 
 The final handler will also unpipe anything from `req` when it is invoked.
 
-#### options.env
-
-By default, the environment is determined by `NODE_ENV` variable, but it can be
-overridden by this option.
-
 #### options.onerror
 
 Provide a function to be called with the `err` when it exists. Can be used for
 writing errors to a central location without excessive function generation. Called
 as `onerror(err, req, res)`.
+
+#### options.stacktrace
+
+Specify if the stack trace of the error should be included in the response. By
+default, this is false, but can be enabled when necessary (like in development).
+It is not recommend to enable this on a production deployment
 
 ## Examples
 
