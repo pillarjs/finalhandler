@@ -29,7 +29,8 @@ be written out to the `res`.
 
 When an error is written, the following information is added to the response:
 
-  * The `res.statusCode` is set from `err.status` (or `err.statusCode`).
+  * The `res.statusCode` is set from `err.status` (or `err.statusCode`) if the
+    value is 4xx or 5xx.
   * The body will be the HTML of the status code message if `env` is
     `'production'`, otherwise will be `err.stack`.
 
