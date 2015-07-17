@@ -70,12 +70,12 @@ function finalhandler(req, res, options) {
     // unhandled error
     if (err) {
       // respect err.statusCode
-      if (err.statusCode) {
+      if (err.statusCode >= 400 && err.statusCode < 600) {
         status = err.statusCode
       }
 
       // respect err.status
-      if (err.status) {
+      if (err.status >= 400 && err.status < 600) {
         status = err.status
       }
 

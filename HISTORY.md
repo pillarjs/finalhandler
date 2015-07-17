@@ -3,6 +3,7 @@ unreleased
 
   * Add `stacktrace` option
   * Add `text/plain` fallback response
+  * Ignore `err.status` with non-error code
   * Remove `env` option; use `stacktrace` option instead
   * Send complete HTML document
 

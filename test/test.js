@@ -31,6 +31,24 @@ describe('finalhandler(req, res)', function () {
       .expect(400, done)
     })
 
+    it('should ignore non-error err.statusCode code', function (done) {
+      var err = new Error()
+      err.statusCode = 201
+      var server = createServer(err)
+      request(server)
+      .get('/')
+      .expect(500, done)
+    })
+
+    it('should ignore weird err.statusCode', function (done) {
+      var err = new Error()
+      err.statusCode = 'oh no'
+      var server = createServer(err)
+      request(server)
+      .get('/')
+      .expect(500, done)
+    })
+
     it('should use err.status', function (done) {
       var err = new Error()
       err.status = 400
@@ -38,6 +56,24 @@ describe('finalhandler(req, res)', function () {
       request(server)
       .get('/')
       .expect(400, done)
+    })
+
+    it('should ignore non-error err.status code', function (done) {
+      var err = new Error()
+      err.status = 201
+      var server = createServer(err)
+      request(server)
+      .get('/')
+      .expect(500, done)
+    })
+
+    it('should ignore weird err.status', function (done) {
+      var err = new Error()
+      err.status = 'oh no'
+      var server = createServer(err)
+      request(server)
+      .get('/')
+      .expect(500, done)
     })
 
     it('should use err.status over err.statusCode', function (done) {
