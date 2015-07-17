@@ -11,6 +11,7 @@
  * @private
  */
 
+var accepts = require('accepts')
 var debug = require('debug')('finalhandler')
 var escapeHtml = require('escape-html')
 var http = require('http')
@@ -55,6 +56,9 @@ function finalhandler(req, res, options) {
   var onerror = opts.onerror
 
   return function (err) {
+    var body
+    var constructBody
+    var msg
     var status = res.statusCode
 
     // ignore 404 on in-flight response
@@ -81,15 +85,12 @@ function finalhandler(req, res, options) {
       }
 
       // production gets a basic error message
-      var msg = env === 'production'
+      msg = env === 'production'
         ? http.STATUS_CODES[status]
         : err.stack || err.toString()
-      msg = escapeHtml(msg)
-        .replace(/\n/g, '<br>')
-        .replace(/  /g, ' &nbsp;') + '\n'
     } else {
       status = 404
-      msg = 'Cannot ' + escapeHtml(req.method) + ' ' + escapeHtml(req.originalUrl || req.url) + '\n'
+      msg = 'Cannot ' + req.method + ' ' + (req.originalUrl || req.url)
     }
 
     debug('default %s', status)
@@ -104,8 +105,76 @@ function finalhandler(req, res, options) {
       return req.socket.destroy()
     }
 
-    send(req, res, status, msg)
+    // negotiate
+    var accept = accepts(req)
+    var type = accept.types('html', 'text')
+
+    // construct body
+    switch (type) {
+      case 'html':
+        constructBody = constructHtmlBody
+        break
+      default:
+        // default to plain text
+        constructBody = constructTextBody
+        break
+    }
+
+    // construct body
+    body = constructBody(status, msg)
+
+    // send response
+    send(req, res, status, body)
   }
+}
+
+/**
+ * Get HTML body string
+ *
+ * @param {number} status
+ * @param {string} message
+ * @return {Buffer}
+ * @api private
+ */
+
+function constructHtmlBody(status, message) {
+  var msg = escapeHtml(message)
+    .replace(/\n/g, '<br>')
+    .replace(/  /g, ' &nbsp;')
+
+  var html = '<!doctype html>\n'
+    + '<html lang=en>\n'
+    + '<head>\n'
+    + '<meta charset=utf-8>\n'
+    + '<title>' + escapeHtml(http.STATUS_CODES[status]) + '</title>\n'
+    + '</head>\n'
+    + '<body>\n'
+    + msg + '\n'
+    + '</body>\n'
+
+  var body = new Buffer(html, 'utf8')
+
+  body.type = 'text/html; charset=utf-8'
+
+  return body
+}
+
+/**
+ * Get plain text body string
+ *
+ * @param {number} status
+ * @param {string} message
+ * @return {Buffer}
+ * @api private
+ */
+
+function constructTextBody(status, message) {
+  var msg = message + '\n'
+  var body = new Buffer(msg, 'utf8')
+
+  body.type = 'text/plain; charset=utf-8'
+
+  return body
 }
 
 /**
@@ -114,7 +183,7 @@ function finalhandler(req, res, options) {
  * @param {IncomingMessage} req
  * @param {OutgoingMessage} res
  * @param {number} status
- * @param {string} body
+ * @param {Buffer} body
  * @private
  */
 
@@ -126,8 +195,8 @@ function send(req, res, status, body) {
     res.setHeader('X-Content-Type-Options', 'nosniff')
 
     // standard headers
-    res.setHeader('Content-Type', 'text/html; charset=utf-8')
-    res.setHeader('Content-Length', Buffer.byteLength(body, 'utf8'))
+    res.setHeader('Content-Type', body.type)
+    res.setHeader('Content-Length', body.length)
 
     if (req.method === 'HEAD') {
       res.end()

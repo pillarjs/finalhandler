@@ -52,11 +52,11 @@ describe('finalhandler(req, res)', function () {
   })
 
   describe('404 response', function () {
-    it('include method and path', function (done) {
+    it('should include method and path', function (done) {
       var server = createServer()
       request(server)
       .get('/foo')
-      .expect(404, 'Cannot GET /foo\n', done)
+      .expect(404, /Cannot GET \/foo/, done)
     })
 
     it('should handle HEAD', function (done) {
@@ -84,6 +84,28 @@ describe('finalhandler(req, res)', function () {
       test.write(buf)
       test.expect(404, done)
     })
+
+    describe('when HTML acceptable', function () {
+      it('should respond with HTML', function (done) {
+        var server = createServer()
+        request(server)
+        .get('/foo')
+        .set('Accept', 'text/html')
+        .expect('Content-Type', 'text/html; charset=utf-8')
+        .expect(404, /<html/, done)
+      })
+    })
+
+    describe('when HTML not acceptable', function () {
+      it('should respond with plain text', function (done) {
+        var server = createServer()
+        request(server)
+        .get('/foo')
+        .set('Accept', 'application/x-bogus')
+        .expect('Content-Type', 'text/plain; charset=utf-8')
+        .expect(404, 'Cannot GET /foo\n', done)
+      })
+    })
   })
 
   describe('error response', function () {
@@ -91,14 +113,14 @@ describe('finalhandler(req, res)', function () {
       var server = createServer(new Error('boom!'))
       request(server)
       .get('/foo')
-      .expect(500, /^Error: boom!<br> &nbsp; &nbsp;at/, done)
+      .expect(500, /Error: boom!.*at.*:[0-9]+:[0-9]+/, done)
     })
 
     it('should handle HEAD', function (done) {
-      var server = createServer()
+      var server = createServer(new Error('boom!'))
       request(server)
       .head('/foo')
-      .expect(404, '', done)
+      .expect(500, '', done)
     })
 
     it('should include security header', function (done) {
@@ -113,7 +135,7 @@ describe('finalhandler(req, res)', function () {
       var server = createServer('lame string')
       request(server)
       .get('/foo')
-      .expect(500, 'lame string\n', done)
+      .expect(500, /lame string/, done)
     })
 
     it('should send staus code name when production', function (done) {
@@ -122,7 +144,8 @@ describe('finalhandler(req, res)', function () {
       var server = createServer(err, {env: 'production'})
       request(server)
       .get('/foo')
-      .expect(501, 'Not Implemented\n', done)
+      .expect(bodyShouldNotContain('boom!'))
+      .expect(501, /Not Implemented/, done)
     })
 
     describe('when there is a request body', function () {
@@ -169,6 +192,36 @@ describe('finalhandler(req, res)', function () {
         test.write(buf)
         test.write(buf)
         test.expect(500, done)
+      })
+    })
+
+    describe('when HTML acceptable', function () {
+      it('should respond with HTML', function (done) {
+        var server = createServer(new Error('boom!'))
+        request(server)
+        .get('/foo')
+        .set('Accept', 'text/html')
+        .expect('Content-Type', 'text/html; charset=utf-8')
+        .expect(500, /<html/, done)
+      })
+
+      it('should escape error stack', function (done) {
+        var server = createServer(new Error('boom!'))
+        request(server)
+        .get('/foo')
+        .set('Accept', 'text/html')
+        .expect(500, /Error: boom!<br> &nbsp; &nbsp;at/, done)
+      })
+    })
+
+    describe('when HTML not acceptable', function () {
+      it('should respond with plain text', function (done) {
+        var server = createServer(new Error('boom!'))
+        request(server)
+        .get('/foo')
+        .set('Accept', 'application/x-bogus')
+        .expect('Content-Type', 'text/plain; charset=utf-8')
+        .expect(500, /Error: boom!\n    at/, done)
       })
     })
 
@@ -265,6 +318,12 @@ describe('finalhandler(req, res)', function () {
     })
   })
 })
+
+function bodyShouldNotContain(str) {
+  return function (res) {
+    assert.ok(res.text.indexOf(str) === -1, 'should not contain "' + str + '" in body')
+  }
+}
 
 function createServer(err, opts) {
   return http.createServer(function (req, res) {
