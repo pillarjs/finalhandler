@@ -323,6 +323,96 @@ describe('finalhandler(req, res)', function () {
     })
   })
 
+  describe('message', function () {
+    it('should reject string', function () {
+      assert.throws(finalhandler.bind(null, {}, {}, {message: 'wat'}), /option message/)
+    })
+
+    it('should display error message for valid err.status', function (done) {
+      var err = new Error('boom!')
+      err.status = 500
+      var server = createServer(err, {message: true})
+      request(server)
+      .get('/foo')
+      .expect(500, /boom!/, done)
+    })
+
+    it('should display error message for valid err.statusCode', function (done) {
+      var err = new Error('boom!')
+      err.statusCode = 500
+      var server = createServer(err, {message: true})
+      request(server)
+      .get('/foo')
+      .expect(500, /boom!/, done)
+    })
+
+    it('should not display error message missing stack property', function (done) {
+      var err = new Error('boom!')
+      var server = createServer(err, {message: true})
+      request(server)
+      .get('/foo')
+      .expect(bodyShouldNotContain('boom!'))
+      .expect(500, /Internal Server Error/, done)
+    })
+
+    it('should not display error message for bad status property', function (done) {
+      var err = new Error('boom!')
+      err.status = 'oh no'
+      var server = createServer(err, {message: true})
+      request(server)
+      .get('/foo')
+      .expect(bodyShouldNotContain('boom!'))
+      .expect(500, /Internal Server Error/, done)
+    })
+
+    it('should escape message for HTML response', function (done) {
+      var err = new Error('<boom>!')
+      err.status = 500
+      var server = createServer(err, {message: true})
+      request(server)
+      .get('/foo')
+      .set('Accept', 'text/html')
+      .expect(500, /&lt;boom&gt;!/, done)
+    })
+
+    describe('when function', function () {
+      it('should use custom function for message', function (done) {
+        var err = new Error('boom!')
+        var server = createServer(err, {message: function (err, status) {
+          return 'custom ' + status + ' ' + err.message
+        }})
+
+        request(server)
+        .get('/foo')
+        .expect(500, /custom 500 boom!/, done)
+      })
+
+      it('should provide fallback for custom function', function (done) {
+        var err = new Error('boom!')
+        var server = createServer(err, {message: function () {
+          return undefined
+        }})
+
+        request(server)
+        .get('/foo')
+        .expect(bodyShouldNotContain('boom!'))
+        .expect(500, /Internal Server Error/, done)
+      })
+
+      it('should escape message for HTML response', function (done) {
+        var err = new Error('<boom>!')
+        var server = createServer(err, {message: function (err) {
+          return 'custom ' + err.message
+        }})
+
+        request(server)
+        .get('/foo')
+        .set('Accept', 'text/html')
+        .expect(500, /custom &lt;boom&gt;!/, done)
+      })
+    })
+  })
+
   describe('onerror', function () {
     it('should be invoked when error', function (done) {
       var err = new Error('boom!')
@@ -370,6 +460,39 @@ describe('finalhandler(req, res)', function () {
       .get('/foo')
       .set('Accept', 'text/html')
       .expect(500, /lame string/, done)
+    })
+
+    describe('when message set', function () {
+      it('should use custom function for message', function (done) {
+        var err = new Error('boom!')
+        var server = createServer(err, {stacktrace: true, message: function (err, status) {
+          return 'custom ' + status + ' ' + err.message
+        }})
+
+        request(server)
+        .get('/foo')
+        .expect(500, /Error: custom 500 boom!.*at.*:[0-9]+:[0-9]+/, done)
+      })
+
+      it('should provide fallback for custom function', function (done) {
+        var err = new Error('boom!')
+        var server = createServer(err, {stacktrace: true, message: function () {
+          return undefined
+        }})
+
+        request(server)
+        .get('/foo')
+        .expect(500, /Error: boom!.*at.*:[0-9]+:[0-9]+/, done)
+      })
+
+      it('should handle non-error-objects', function (done) {
+        var err = 'lame string'
+        var server = createServer(err, {stacktrace: true, message: true})
+
+        request(server)
+        .get('/foo')
+        .expect(500, /lame string/, done)
+      })
     })
   })
 })
