@@ -49,6 +49,15 @@ module.exports = finalhandler
 function finalhandler(req, res, options) {
   var opts = options || {}
 
+  // get message option
+  var message = opts.message === true
+    ? getDefaultErrorMessage
+    : opts.message || false
+
+  if (typeof message !== 'boolean' && typeof message !== 'function') {
+    throw new TypeError('option message must be boolean or function')
+  }
+
   // get error callback
   var onerror = opts.onerror
 
@@ -69,25 +78,18 @@ function finalhandler(req, res, options) {
 
     // unhandled error
     if (err) {
-      // respect err.statusCode
-      if (err.statusCode >= 400 && err.statusCode < 600) {
-        status = err.statusCode
-      }
-
-      // respect err.status
-      if (err.status >= 400 && err.status < 600) {
-        status = err.status
-      }
+      // respect status code from error
+      status = getErrorStatusCode(err) || status
 
       // default status code to 500
       if (!status || status < 400) {
         status = 500
       }
 
-      // production gets a basic error message
+      // build a stack trace or normal message
       msg = stacktrace
-        ? err.stack || String(err)
-        : http.STATUS_CODES[status]
+        ? getErrorStack(err, status, message)
+        : getErrorMessage(err, status, message)
     } else {
       status = 404
       msg = 'Cannot ' + req.method + ' ' + (req.originalUrl || req.url)
@@ -175,6 +177,97 @@ function constructTextBody(status, message) {
   body.type = 'text/plain; charset=utf-8'
 
   return body
+}
+
+/**
+ * Get message from error
+ *
+ * @param {object} err
+ * @param {number} status
+ * @param {function} message
+ * @return {string}
+ * @api private
+ */
+
+function getErrorMessage(err, status, message) {
+  var msg
+
+  if (message) {
+    msg = message(err, status)
+  }
+
+  return msg || http.STATUS_CODES[status]
+}
+
+/**
+ * Get default message from error
+ *
+ * @param {object} err
+ * @return {string}
+ * @api private
+ */
+
+function getDefaultErrorMessage(err) {
+  return (err.status >= 400 && err.status < 600) || (err.statusCode >= 400 && err.statusCode < 600)
+    ? err.message
+    : undefined
+}
+
+/**
+ * Get stack from error with custom message
+ *
+ * @param {object} err
+ * @param {number} status
+ * @param {function} message
+ * @return {string}
+ * @api private
+ */
+
+function getErrorStack(err, status, message) {
+  var stack = err.stack || ''
+
+  if (message) {
+    var index = stack.indexOf('\n')
+    var msg = message(err, status) || err.message || String(err)
+    var name = err.name
+
+    // slice implicit message from top of stack
+    if (index !== -1) {
+      stack = stack.substr(index)
+    }
+
+    // prepend name and message to stack
+    stack = name
+      ? name + ': ' + msg + stack
+      : msg + stack
+  } else if (!stack) {
+    // stringify error when no message generator and no stack
+    stack = String(err)
+  }
+
+  return stack
+}
+
+/**
+ * Get status code from an Error object.
+ *
+ * @param {object} err
+ * @return {number}
+ * @private
+ */
+
+function getErrorStatusCode(err) {
+  // check err.status
+  if (err.status >= 400 && err.status < 600) {
+    return err.status
+  }
+
+  // check err.statusCode
+  if (err.statusCode >= 400 && err.statusCode < 600) {
+    return err.statusCode
+  }
+
+  return undefined
 }
 
 /**

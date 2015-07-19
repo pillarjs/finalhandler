@@ -1,6 +1,7 @@
 unreleased
 ==========
 
+  * Add `message` option
   * Add `stacktrace` option
   * Add `text/plain` fallback response
   * Ignore `err.status` with non-error code

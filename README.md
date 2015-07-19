@@ -30,6 +30,23 @@ value is 4xx or 5xx.
 
 The final handler will also unpipe anything from `req` when it is invoked.
 
+#### options.message
+
+Determine if the error message should be displayed. By default this is false unless
+`stacktrace` is enabled. When true, the default behavior will be used to display
+the message, which is to use `err.message` if there is a valid `err.status` property.
+
+A function can also be provided to customize the message. The `err` value and outgoing
+`status` code are passed and a message string is expected to be returned. If a falsy
+value is returned, the response will act as if this option was the default.
+
+```js
+var done = finalhandler(req, res, {message: function (err, status) {
+  // only display message when err.public is true
+  return err.public ? err.message : undefined
+}})
+```
+
 #### options.onerror
 
 Provide a function to be called with the `err` when it exists. Can be used for
