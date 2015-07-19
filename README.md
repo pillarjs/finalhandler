@@ -118,6 +118,37 @@ var server = http.createServer(function (req, res) {
 server.listen(3000)
 ```
 
+### display err.message to users
+
+```js
+var finalhandler = require('finalhandler')
+var http = require('http')
+
+var server = http.createServer(function (req, res) {
+  var done = finalhandler(req, res, {message: true})
+  var err = new Error('Please try again later')
+  err.status = 503
+  done(err)
+})
+
+server.listen(3000)
+```
+
+### display error stack trace for development debugging
+
+```js
+var finalhandler = require('finalhandler')
+var http = require('http')
+
+var server = http.createServer(function (req, res) {
+  var done = finalhandler(req, res, {stacktrace: true})
+  var err = new Error('oops')
+  done(err)
+})
+
+server.listen(3000)
+```
+
 ### keep log of all errors
 
 ```js
