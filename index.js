@@ -136,7 +136,7 @@ function finalhandler (req, res, options) {
  * @param {number} status
  * @param {string} message
  * @return {Buffer}
- * @api private
+ * @private
  */
 
 function constructHtmlBody (status, message) {
@@ -167,7 +167,7 @@ function constructHtmlBody (status, message) {
  * @param {number} status
  * @param {string} message
  * @return {Buffer}
- * @api private
+ * @private
  */
 
 function constructTextBody (status, message) {
@@ -186,7 +186,7 @@ function constructTextBody (status, message) {
  * @param {number} status
  * @param {function} message
  * @return {string}
- * @api private
+ * @private
  */
 
 function getErrorMessage (err, status, message) {
@@ -204,7 +204,7 @@ function getErrorMessage (err, status, message) {
  *
  * @param {object} err
  * @return {string}
- * @api private
+ * @private
  */
 
 function getDefaultErrorMessage (err) {
@@ -220,7 +220,7 @@ function getDefaultErrorMessage (err) {
  * @param {number} status
  * @param {function} message
  * @return {string}
- * @api private
+ * @private
  */
 
 function getErrorStack (err, status, message) {
