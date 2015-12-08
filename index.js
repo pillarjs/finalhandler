@@ -75,6 +75,11 @@ function finalhandler(req, res, options) {
         status = err.status
       }
 
+      // allow to pass just the status code
+      if (typeof err === 'number') {
+        status = err
+      }
+
       // default status code to 500
       if (!status || status < 400) {
         status = 500
