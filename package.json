@@ -14,7 +14,7 @@
   "devDependencies": {
     "istanbul": "0.4.2",
     "mocha": "2.4.5",
-    "readable-stream": "2.0.4",
+    "readable-stream": "2.1.2",
     "supertest": "1.1.0"
   },
   "files": [
