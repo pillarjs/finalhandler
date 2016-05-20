@@ -25,7 +25,7 @@ var unpipe = require('unpipe')
 /* istanbul ignore next */
 var defer = typeof setImmediate === 'function'
   ? setImmediate
-  : function(fn){ process.nextTick(fn.bind.apply(fn, arguments)) }
+  : function (fn) { process.nextTick(fn.bind.apply(fn, arguments)) }
 var isFinished = onFinished.isFinished
 
 /**
@@ -45,7 +45,7 @@ module.exports = finalhandler
  * @public
  */
 
-function finalhandler(req, res, options) {
+function finalhandler (req, res, options) {
   var opts = options || {}
 
   // get environment
@@ -86,7 +86,7 @@ function finalhandler(req, res, options) {
         : err.stack || err.toString()
       msg = escapeHtml(msg)
         .replace(/\n/g, '<br>')
-        .replace(/  /g, ' &nbsp;') + '\n'
+        .replace(/\x20{2}/g, ' &nbsp;') + '\n'
     } else {
       status = 404
       msg = 'Cannot ' + escapeHtml(req.method) + ' ' + escapeHtml(req.originalUrl || req.url) + '\n'
@@ -118,8 +118,8 @@ function finalhandler(req, res, options) {
  * @private
  */
 
-function send(req, res, status, body) {
-  function write() {
+function send (req, res, status, body) {
+  function write () {
     res.statusCode = status
 
     // security header for content sniffing
