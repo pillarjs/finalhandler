@@ -124,7 +124,7 @@ function logerror(err) {
 [npm-image]: https://img.shields.io/npm/v/finalhandler.svg
 [npm-url]: https://npmjs.org/package/finalhandler
 [node-image]: https://img.shields.io/node/v/finalhandler.svg
-[node-url]: http://nodejs.org/download/
+[node-url]: https://nodejs.org/en/download
 [travis-image]: https://img.shields.io/travis/pillarjs/finalhandler.svg
 [travis-url]: https://travis-ci.org/pillarjs/finalhandler
 [coveralls-image]: https://img.shields.io/coveralls/pillarjs/finalhandler.svg
