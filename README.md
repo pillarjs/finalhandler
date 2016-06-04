@@ -25,7 +25,13 @@ var finalhandler = require('finalhandler')
 Returns function to be invoked as the final step for the given `req` and `res`.
 This function is to be invoked as `fn(err)`. If `err` is falsy, the handler will
 write out a 404 response to the `res`. If it is truthy, an error response will
-be written out to the `res`, and `res.statusCode` is set from `err.status`.
+be written out to the `res`.
+
+When an error is written, the following information is added to the response:
+
+  * The `res.statusCode` is set from `err.status` (or `err.statusCode`).
+  * The body will be the HTML of the status code message if `env` is
+    `'production'`, otherwise will be `err.stack`.
 
 The final handler will also unpipe anything from `req` when it is invoked.
 
