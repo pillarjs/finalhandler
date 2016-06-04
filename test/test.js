@@ -49,6 +49,15 @@ describe('finalhandler(req, res)', function () {
       .get('/')
       .expect(400, done)
     })
+
+    it('should set status to 500 when err.status < 400', function (done) {
+      var err = new Error()
+      err.status = 202
+      var server = createServer(err)
+      request(server)
+      .get('/')
+      .expect(500, done)
+    })
   })
 
   describe('404 response', function () {
@@ -173,7 +182,7 @@ describe('finalhandler(req, res)', function () {
     })
 
     describe('when res.statusCode set', function () {
-      it('should keep when > 400', function (done) {
+      it('should keep when >= 400', function (done) {
         var server = http.createServer(function (req, res) {
           var done = finalhandler(req, res)
           res.statusCode = 503
