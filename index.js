@@ -13,8 +13,8 @@
 
 var debug = require('debug')('finalhandler')
 var escapeHtml = require('escape-html')
-var http = require('http')
 var onFinished = require('on-finished')
+var statuses = require('statuses')
 var unpipe = require('unpipe')
 
 /**
@@ -82,7 +82,7 @@ function finalhandler (req, res, options) {
 
       // production gets a basic error message
       var msg = env === 'production'
-        ? http.STATUS_CODES[status]
+        ? statuses[status]
         : err.stack || err.toString()
       msg = escapeHtml(msg)
         .replace(/\n/g, '<br>')

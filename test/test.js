@@ -207,6 +207,15 @@ describe('finalhandler(req, res)', function () {
         .get('/foo')
         .expect(414, done)
       })
+
+      it('should default body to status message in production', function (done) {
+        var err = new Error('boom!')
+        err.status = 509
+        var server = createServer(err, {env: 'production'})
+        request(server)
+        .get('/foo')
+        .expect(509, 'Bandwidth Limit Exceeded\n', done)
+      })
     })
 
     describe('when res.statusCode undefined', function () {

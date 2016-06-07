@@ -1,3 +1,9 @@
+unreleased
+==========
+
+  * Use `statuses` instead of `http` module for status messages
+    - Includes all defined status messages
+
 0.4.1 / 2015-12-02
 ==================
 
