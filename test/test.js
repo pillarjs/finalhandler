@@ -58,6 +58,15 @@ describe('finalhandler(req, res)', function () {
       .get('/')
       .expect(500, done)
     })
+
+    it('should set status to 500 when err.status > 599', function (done) {
+      var err = new Error()
+      err.status = 601
+      var server = createServer(err)
+      request(server)
+      .get('/')
+      .expect(500, done)
+    })
   })
 
   describe('404 response', function () {

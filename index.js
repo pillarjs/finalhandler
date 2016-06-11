@@ -75,8 +75,8 @@ function finalhandler (req, res, options) {
         status = err.status
       }
 
-      // default status code to 500
-      if (!status || status < 400) {
+      // default status code to 500 if outside valid range
+      if (!status || status < 400 || status > 599) {
         status = 500
       }
 
@@ -120,6 +120,7 @@ function finalhandler (req, res, options) {
 
 function send (req, res, status, body) {
   function write () {
+    // set status code
     res.statusCode = status
 
     // security header for content sniffing
