@@ -2,6 +2,7 @@ unreleased
 ==========
 
   * Change invalid status code to 500
+  * Overwrite status message to match set status code
   * Use `statuses` instead of `http` module for status messages
     - Includes all defined status messages
 

@@ -6,6 +6,10 @@ var request = require('supertest')
 var stream = require('readable-stream')
 var util = require('util')
 
+var describeStatusMessage = !/statusMessage/.test(http.IncomingMessage.toString())
+  ? describe.skip
+  : describe
+
 describe('finalhandler(req, res)', function () {
   describe('status code', function () {
     it('should 404 on no error', function (done) {
@@ -65,6 +69,43 @@ describe('finalhandler(req, res)', function () {
       var server = createServer(err)
       request(server)
       .get('/')
+      .expect(500, done)
+    })
+  })
+
+  describeStatusMessage('status message', function () {
+    it('should be "Not Found" on no error', function (done) {
+      request(createServer())
+      .get('/')
+      .expect(shouldHaveStatusMessage('Not Found'))
+      .expect(404, done)
+    })
+
+    it('should be "Internal Server Error" on error', function (done) {
+      request(createServer(new Error()))
+      .get('/')
+      .expect(shouldHaveStatusMessage('Internal Server Error'))
+      .expect(500, done)
+    })
+
+    it('should be "Bad Request" when err.statusCode = 400', function (done) {
+      var err = new Error()
+      err.status = 400
+      request(createServer(err))
+      .get('/')
+      .expect(shouldHaveStatusMessage('Bad Request'))
+      .expect(400, done)
+    })
+
+    it('should reset existing res.statusMessage', function (done) {
+      function onRequest (req, res, next) {
+        res.statusMessage = 'An Error Occurred'
+        next(new Error())
+      }
+
+      request(createServer(onRequest))
+      .get('/')
+      .expect(shouldHaveStatusMessage('Internal Server Error'))
       .expect(500, done)
     })
   })
@@ -308,6 +349,12 @@ function createServer (err, opts) {
 
 function createSlowWriteStream () {
   return new SlowWriteStream()
+}
+
+function shouldHaveStatusMessage (statusMessage) {
+  return function (test) {
+    assert.equal(test.res.statusMessage, statusMessage, 'should have statusMessage "' + statusMessage + '"')
+  }
 }
 
 function SlowWriteStream () {

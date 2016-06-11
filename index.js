@@ -120,8 +120,9 @@ function finalhandler (req, res, options) {
 
 function send (req, res, status, body) {
   function write () {
-    // set status code
+    // response status
     res.statusCode = status
+    res.statusMessage = statuses[status]
 
     // security header for content sniffing
     res.setHeader('X-Content-Type-Options', 'nosniff')
