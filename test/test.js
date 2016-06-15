@@ -13,61 +13,54 @@ var describeStatusMessage = !/statusMessage/.test(http.IncomingMessage.toString(
 describe('finalhandler(req, res)', function () {
   describe('status code', function () {
     it('should 404 on no error', function (done) {
-      var server = createServer()
-      request(server)
+      request(createServer())
       .get('/')
       .expect(404, done)
     })
 
     it('should 500 on error', function (done) {
-      var server = createServer(new Error())
-      request(server)
+      request(createServer(createError()))
       .get('/')
       .expect(500, done)
     })
 
     it('should use err.statusCode', function (done) {
-      var err = new Error()
-      err.statusCode = 400
-      var server = createServer(err)
-      request(server)
+      request(createServer(createError('nope', {
+        statusCode: 400
+      })))
       .get('/')
       .expect(400, done)
     })
 
     it('should use err.status', function (done) {
-      var err = new Error()
-      err.status = 400
-      var server = createServer(err)
-      request(server)
+      request(createServer(createError('nope', {
+        status: 400
+      })))
       .get('/')
       .expect(400, done)
     })
 
     it('should use err.status over err.statusCode', function (done) {
-      var err = new Error()
-      err.status = 400
-      err.statusCode = 401
-      var server = createServer(err)
-      request(server)
+      request(createServer(createError('nope', {
+        status: 400,
+        statusCode: 401
+      })))
       .get('/')
       .expect(400, done)
     })
 
     it('should set status to 500 when err.status < 400', function (done) {
-      var err = new Error()
-      err.status = 202
-      var server = createServer(err)
-      request(server)
+      request(createServer(createError('oops', {
+        status: 202
+      })))
       .get('/')
       .expect(500, done)
     })
 
     it('should set status to 500 when err.status > 599', function (done) {
-      var err = new Error()
-      err.status = 601
-      var server = createServer(err)
-      request(server)
+      request(createServer(createError('oops', {
+        status: 601
+      })))
       .get('/')
       .expect(500, done)
     })
@@ -82,16 +75,16 @@ describe('finalhandler(req, res)', function () {
     })
 
     it('should be "Internal Server Error" on error', function (done) {
-      request(createServer(new Error()))
+      request(createServer(createError()))
       .get('/')
       .expect(shouldHaveStatusMessage('Internal Server Error'))
       .expect(500, done)
     })
 
     it('should be "Bad Request" when err.statusCode = 400', function (done) {
-      var err = new Error()
-      err.status = 400
-      request(createServer(err))
+      request(createServer(createError('oops', {
+        status: 400
+      })))
       .get('/')
       .expect(shouldHaveStatusMessage('Bad Request'))
       .expect(400, done)
@@ -112,22 +105,19 @@ describe('finalhandler(req, res)', function () {
 
   describe('404 response', function () {
     it('include method and path', function (done) {
-      var server = createServer()
-      request(server)
+      request(createServer())
       .get('/foo')
       .expect(404, 'Cannot GET /foo\n', done)
     })
 
     it('should handle HEAD', function (done) {
-      var server = createServer()
-      request(server)
+      request(createServer())
       .head('/foo')
       .expect(404, '', done)
     })
 
     it('should include security header', function (done) {
-      var server = createServer()
-      request(server)
+      request(createServer())
       .get('/foo')
       .expect('X-Content-Type-Options', 'nosniff')
       .expect(404, done)
@@ -147,39 +137,37 @@ describe('finalhandler(req, res)', function () {
 
   describe('error response', function () {
     it('should include error stack', function (done) {
-      var server = createServer(new Error('boom!'))
-      request(server)
+      request(createServer(createError('boom!')))
       .get('/foo')
       .expect(500, /^Error: boom!<br> &nbsp; &nbsp;at/, done)
     })
 
     it('should handle HEAD', function (done) {
-      var server = createServer()
-      request(server)
+      request(createServer())
       .head('/foo')
       .expect(404, '', done)
     })
 
     it('should include security header', function (done) {
-      var server = createServer(new Error('boom!'))
-      request(server)
+      request(createServer(createError('boom!')))
       .get('/foo')
       .expect('X-Content-Type-Options', 'nosniff')
       .expect(500, done)
     })
 
     it('should handle non-error-objects', function (done) {
-      var server = createServer('lame string')
-      request(server)
+      request(createServer('lame string'))
       .get('/foo')
       .expect(500, 'lame string\n', done)
     })
 
     it('should send staus code name when production', function (done) {
-      var err = new Error('boom!')
-      err.status = 501
-      var server = createServer(err, {env: 'production'})
-      request(server)
+      var err = createError('boom!', {
+        status: 501
+      })
+      request(createServer(err, {
+        env: 'production'
+      }))
       .get('/foo')
       .expect(501, 'Not Implemented\n', done)
     })
@@ -247,9 +235,10 @@ describe('finalhandler(req, res)', function () {
       it('should override with err.status', function (done) {
         var server = http.createServer(function (req, res) {
           var done = finalhandler(req, res)
-          var err = new Error('oops')
-          res.statusCode = 503
-          err.status = 414
+          var err = createError('oops', {
+            status: 414,
+            statusCode: 503
+          })
           done(err)
         })
 
@@ -259,10 +248,12 @@ describe('finalhandler(req, res)', function () {
       })
 
       it('should default body to status message in production', function (done) {
-        var err = new Error('boom!')
-        err.status = 509
-        var server = createServer(err, {env: 'production'})
-        request(server)
+        var err = createError('boom!', {
+          status: 509
+        })
+        request(createServer(err, {
+          env: 'production'
+        }))
         .get('/foo')
         .expect(509, 'Bandwidth Limit Exceeded\n', done)
       })
@@ -321,10 +312,12 @@ describe('finalhandler(req, res)', function () {
     it('should be invoked when error', function (done) {
       var err = new Error('boom!')
       var error
-      var log = function (e) { error = e }
-      var server = createServer(err, {onerror: log})
 
-      request(server)
+      function log (e) {
+        error = e
+      }
+
+      request(createServer(err, {onerror: log}))
       .get('/')
       .end(function () {
         assert.equal(error, err)
@@ -333,6 +326,18 @@ describe('finalhandler(req, res)', function () {
     })
   })
 })
+
+function createError (message, props) {
+  var err = new Error(message)
+
+  if (props) {
+    for (var prop in props) {
+      err[prop] = props[prop]
+    }
+  }
+
+  return err
+}
 
 function createServer (err, opts) {
   return http.createServer(function (req, res) {
