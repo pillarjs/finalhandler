@@ -34,6 +34,7 @@ When an error is written, the following information is added to the response:
   * The `res.statusMessage` is set according to the status code.
   * The body will be the HTML of the status code message if `env` is
     `'production'`, otherwise will be `err.stack`.
+  * Any headers specified in an `err.headers` object.
 
 The final handler will also unpipe anything from `req` when it is invoked.
 

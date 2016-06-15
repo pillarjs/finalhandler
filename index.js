@@ -55,6 +55,7 @@ function finalhandler (req, res, options) {
   var onerror = opts.onerror
 
   return function (err) {
+    var headers = Object.create(null)
     var status = res.statusCode
 
     // ignore 404 on in-flight response
@@ -78,6 +79,15 @@ function finalhandler (req, res, options) {
       // default status code to 500 if outside valid range
       if (!status || status < 400 || status > 599) {
         status = 500
+      }
+
+      // respect err.headers
+      if (err.headers && (err.status === status || err.statusCode === status)) {
+        var keys = Object.keys(err.headers)
+        for (var i = 0; i < keys.length; i++) {
+          var key = keys[i]
+          headers[key] = err.headers[key]
+        }
       }
 
       // production gets a basic error message
@@ -106,7 +116,8 @@ function finalhandler (req, res, options) {
       return
     }
 
-    send(req, res, status, msg)
+    // send response
+    send(req, res, status, headers, msg)
   }
 }
 
@@ -116,15 +127,23 @@ function finalhandler (req, res, options) {
  * @param {IncomingMessage} req
  * @param {OutgoingMessage} res
  * @param {number} status
+ * @param {object} headers
  * @param {string} body
  * @private
  */
 
-function send (req, res, status, body) {
+function send (req, res, status, headers, body) {
   function write () {
     // response status
     res.statusCode = status
     res.statusMessage = statuses[status]
+
+    // response headers
+    var keys = Object.keys(headers)
+    for (var i = 0; i < keys.length; i++) {
+      var key = keys[i]
+      res.setHeader(key, headers[key])
+    }
 
     // security header for content sniffing
     res.setHeader('X-Content-Type-Options', 'nosniff')

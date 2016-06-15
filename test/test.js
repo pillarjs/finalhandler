@@ -11,6 +11,58 @@ var describeStatusMessage = !/statusMessage/.test(http.IncomingMessage.toString(
   : describe
 
 describe('finalhandler(req, res)', function () {
+  describe('headers', function () {
+    it('should ignore err.headers without status code', function (done) {
+      request(createServer(createError('oops!', {
+        headers: {'X-Custom-Header': 'foo'}
+      })))
+      .get('/')
+      .expect(shouldNotHaveHeader('X-Custom-Header'))
+      .expect(500, done)
+    })
+
+    it('should ignore err.headers with invalid res.status', function (done) {
+      request(createServer(createError('oops!', {
+        headers: {'X-Custom-Header': 'foo'},
+        status: 601
+      })))
+      .get('/')
+      .expect(shouldNotHaveHeader('X-Custom-Header'))
+      .expect(500, done)
+    })
+
+    it('should ignore err.headers with invalid res.statusCode', function (done) {
+      request(createServer(createError('oops!', {
+        headers: {'X-Custom-Header': 'foo'},
+        statusCode: 601
+      })))
+      .get('/')
+      .expect(shouldNotHaveHeader('X-Custom-Header'))
+      .expect(500, done)
+    })
+
+    it('should include err.headers with err.status', function (done) {
+      request(createServer(createError('oops!', {
+        headers: {'X-Custom-Header': 'foo=500', 'X-Custom-Header2': 'bar'},
+        status: 500
+      })))
+      .get('/')
+      .expect('X-Custom-Header', 'foo=500')
+      .expect('X-Custom-Header2', 'bar')
+      .expect(500, done)
+    })
+
+    it('should include err.headers with err.statusCode', function (done) {
+      request(createServer(createError('too many requests', {
+        headers: {'Retry-After': '5'},
+        statusCode: 429
+      })))
+      .get('/')
+      .expect('Retry-After', '5')
+      .expect(429, done)
+    })
+  })
+
   describe('status code', function () {
     it('should 404 on no error', function (done) {
       request(createServer())
@@ -297,7 +349,10 @@ describe('finalhandler(req, res)', function () {
         res.statusCode = 301
         res.write('0')
         process.nextTick(function () {
-          done(new Error('boom!'))
+          done(createError('too many requests', {
+            status: 429,
+            headers: {'Retry-After': '5'}
+          }))
           res.end('1')
         })
       })
@@ -359,6 +414,12 @@ function createSlowWriteStream () {
 function shouldHaveStatusMessage (statusMessage) {
   return function (test) {
     assert.equal(test.res.statusMessage, statusMessage, 'should have statusMessage "' + statusMessage + '"')
+  }
+}
+
+function shouldNotHaveHeader (header) {
+  return function (test) {
+    assert.ok(test.res.headers[header] === undefined, 'response does not have header "' + header + '"')
   }
 }
 
