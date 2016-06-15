@@ -56,7 +56,7 @@ function finalhandler (req, res, options) {
 
   return function (err) {
     var headers = Object.create(null)
-    var status = res.statusCode
+    var status
 
     // ignore 404 on in-flight response
     if (!err && res._header) {
@@ -66,15 +66,8 @@ function finalhandler (req, res, options) {
 
     // unhandled error
     if (err) {
-      // respect err.statusCode
-      if (err.statusCode) {
-        status = err.statusCode
-      }
-
-      // respect err.status
-      if (err.status) {
-        status = err.status
-      }
+      // respect status code from error
+      status = getErrorStatusCode(err) || res.statusCode
 
       // default status code to 500 if outside valid range
       if (typeof status !== 'number' || status < 400 || status > 599) {
@@ -119,6 +112,28 @@ function finalhandler (req, res, options) {
     // send response
     send(req, res, status, headers, msg)
   }
+}
+
+/**
+ * Get status code from Error object.
+ *
+ * @param {Error} err
+ * @return {number}
+ * @private
+ */
+
+function getErrorStatusCode (err) {
+  // check err.status
+  if (typeof err.status === 'number' && err.status >= 400 && err.status < 600) {
+    return err.status
+  }
+
+  // check err.statusCode
+  if (typeof err.statusCode === 'number' && err.statusCode >= 400 && err.statusCode < 600) {
+    return err.statusCode
+  }
+
+  return undefined
 }
 
 /**

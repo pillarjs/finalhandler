@@ -117,6 +117,15 @@ describe('finalhandler(req, res)', function () {
       .expect(500, done)
     })
 
+    it('should use err.statusCode over invalid err.status', function (done) {
+      request(createServer(createError('nope', {
+        status: 50,
+        statusCode: 410
+      })))
+      .get('/')
+      .expect(410, done)
+    })
+
     it('should ignore non-numeric err.status', function (done) {
       request(createServer(createError('oops', {
         status: 'oh no'
