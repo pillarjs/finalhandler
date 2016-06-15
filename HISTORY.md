@@ -1,7 +1,7 @@
 unreleased
 ==========
 
-  * Change invalid status code to 500
+  * Change invalid or non-numeric status code to 500
   * Overwrite status message to match set status code
   * Set response headers from `err.headers` object
   * Use `statuses` instead of `http` module for status messages

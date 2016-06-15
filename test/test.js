@@ -116,6 +116,14 @@ describe('finalhandler(req, res)', function () {
       .get('/')
       .expect(500, done)
     })
+
+    it('should ignore non-numeric err.status', function (done) {
+      request(createServer(createError('oops', {
+        status: 'oh no'
+      })))
+      .get('/')
+      .expect(500, done)
+    })
   })
 
   describeStatusMessage('status message', function () {
@@ -282,6 +290,18 @@ describe('finalhandler(req, res)', function () {
         request(server)
         .get('/foo')
         .expect(503, done)
+      })
+
+      it('should convert to 500 is not a number', function (done) {
+        var server = http.createServer(function (req, res) {
+          var done = finalhandler(req, res)
+          res.statusCode = 'oh no'
+          done(new Error('oops'))
+        })
+
+        request(server)
+        .get('/foo')
+        .expect(500, done)
       })
 
       it('should override with err.status', function (done) {

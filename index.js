@@ -77,7 +77,7 @@ function finalhandler (req, res, options) {
       }
 
       // default status code to 500 if outside valid range
-      if (!status || status < 400 || status > 599) {
+      if (typeof status !== 'number' || status < 400 || status > 599) {
         status = 500
       }
 
