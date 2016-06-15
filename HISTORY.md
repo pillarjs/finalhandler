@@ -1,5 +1,5 @@
-unreleased
-==========
+0.5.0 / 2016-06-15
+==================
 
   * Change invalid or non-numeric status code to 500
   * Overwrite status message to match set status code
