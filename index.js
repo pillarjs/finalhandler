@@ -157,11 +157,7 @@ function send (req, res, status, headers, body) {
     res.statusMessage = statuses[status]
 
     // response headers
-    var keys = Object.keys(headers)
-    for (var i = 0; i < keys.length; i++) {
-      var key = keys[i]
-      res.setHeader(key, headers[key])
-    }
+    setHeaders(res, headers)
 
     // security header for content sniffing
     res.setHeader('X-Content-Type-Options', 'nosniff')
@@ -189,4 +185,20 @@ function send (req, res, status, headers, body) {
   // flush the request
   onFinished(req, write)
   req.resume()
+}
+
+/**
+ * Set response headers from an object.
+ *
+ * @param {OutgoingMessage} res
+ * @param {object} headers
+ * @private
+ */
+
+function setHeaders (res, headers) {
+  var keys = Object.keys(headers)
+  for (var i = 0; i < keys.length; i++) {
+    var key = keys[i]
+    res.setHeader(key, headers[key])
+  }
 }
