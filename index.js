@@ -22,6 +22,9 @@ var unpipe = require('unpipe')
  * @private
  */
 
+var DOUBLE_SPACE_REGEXP = /\x20{2}/g
+var NEWLINE_REGEXP = /\n/g
+
 /* istanbul ignore next */
 var defer = typeof setImmediate === 'function'
   ? setImmediate
@@ -88,8 +91,8 @@ function finalhandler (req, res, options) {
         ? statuses[status]
         : err.stack || err.toString()
       msg = escapeHtml(msg)
-        .replace(/\n/g, '<br>')
-        .replace(/\x20{2}/g, ' &nbsp;') + '\n'
+        .replace(NEWLINE_REGEXP, '<br>')
+        .replace(DOUBLE_SPACE_REGEXP, ' &nbsp;') + '\n'
     } else {
       status = 404
       msg = 'Cannot ' + escapeHtml(req.method) + ' ' + escapeHtml(req.originalUrl || req.url) + '\n'
