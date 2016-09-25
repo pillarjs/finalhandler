@@ -70,15 +70,18 @@ function finalhandler (req, res, options) {
     // unhandled error
     if (err) {
       // respect status code from error
-      status = getErrorStatusCode(err) || res.statusCode
+      status = getErrorStatusCode(err)
 
-      // default status code to 500 if outside valid range
-      if (typeof status !== 'number' || status < 400 || status > 599) {
-        status = 500
-      }
+      if (status === undefined) {
+        // fallback to status code on response
+        status = res.statusCode
 
-      // respect err.headers
-      if (err.headers && (err.status === status || err.statusCode === status)) {
+        // default status code to 500 if outside valid range
+        if (typeof status !== 'number' || status < 400 || status > 599) {
+          status = 500
+        }
+      } else if (err.headers) {
+        // respect headers from error
         var keys = Object.keys(err.headers)
         for (var i = 0; i < keys.length; i++) {
           var key = keys[i]

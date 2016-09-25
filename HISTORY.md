@@ -2,6 +2,7 @@ unreleased
 ==========
 
   * perf: hoist regular expressions
+  * perf: remove duplicate validation path
 
 0.5.0 / 2016-06-15
 ==================
