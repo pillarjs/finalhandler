@@ -1,6 +1,6 @@
 /*!
  * finalhandler
- * Copyright(c) 2014-2015 Douglas Christopher Wilson
+ * Copyright(c) 2014-2016 Douglas Christopher Wilson
  * MIT Licensed
  */
 
