@@ -72,21 +72,18 @@ function finalhandler (req, res, options) {
       // respect status code from error
       status = getErrorStatusCode(err)
 
-      if (status === undefined) {
-        // fallback to status code on response
-        status = res.statusCode
-
-        // default status code to 500 if outside valid range
-        if (typeof status !== 'number' || status < 400 || status > 599) {
-          status = 500
-        }
-      } else if (err.headers) {
-        // respect headers from error
+      // respect headers from error
+      if (status !== undefined && err.headers) {
         var keys = Object.keys(err.headers)
         for (var i = 0; i < keys.length; i++) {
           var key = keys[i]
           headers[key] = err.headers[key]
         }
+      }
+
+      // fallback to status code on response
+      if (status === undefined) {
+        status = getResponseStatusCode(res)
       }
 
       // production gets a basic error message
@@ -140,6 +137,25 @@ function getErrorStatusCode (err) {
   }
 
   return undefined
+}
+
+/**
+ * Get status code from response.
+ *
+ * @param {OutgoingMessage} res
+ * @return {number}
+ * @private
+ */
+
+function getResponseStatusCode (res) {
+  var status = res.statusCode
+
+  // default status code to 500 if outside valid range
+  if (typeof status !== 'number' || status < 400 || status > 599) {
+    status = 500
+  }
+
+  return status
 }
 
 /**
