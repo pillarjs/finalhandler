@@ -1,6 +1,7 @@
 unreleased
 ==========
 
+  * Fix exception when `err.headers` is not an object
   * perf: hoist regular expressions
   * perf: remove duplicate validation path
 

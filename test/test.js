@@ -61,6 +61,15 @@ describe('finalhandler(req, res)', function () {
       .expect('Retry-After', '5')
       .expect(429, done)
     })
+
+    it('should ignore err.headers when not an object', function (done) {
+      request(createServer(createError('oops!', {
+        headers: 'foobar',
+        statusCode: 500
+      })))
+      .get('/')
+      .expect(500, done)
+    })
   })
 
   describe('status code', function () {

@@ -58,7 +58,7 @@ function finalhandler (req, res, options) {
   var onerror = opts.onerror
 
   return function (err) {
-    var headers = Object.create(null)
+    var headers
     var status
 
     // ignore 404 on in-flight response
@@ -73,12 +73,8 @@ function finalhandler (req, res, options) {
       status = getErrorStatusCode(err)
 
       // respect headers from error
-      if (status !== undefined && err.headers) {
-        var keys = Object.keys(err.headers)
-        for (var i = 0; i < keys.length; i++) {
-          var key = keys[i]
-          headers[key] = err.headers[key]
-        }
+      if (status !== undefined) {
+        headers = getErrorHeaders(err)
       }
 
       // fallback to status code on response
@@ -115,6 +111,30 @@ function finalhandler (req, res, options) {
     // send response
     send(req, res, status, headers, msg)
   }
+}
+
+/**
+ * Get headers from Error object.
+ *
+ * @param {Error} err
+ * @return {object}
+ * @private
+ */
+
+function getErrorHeaders (err) {
+  if (!err.headers || typeof err.headers !== 'object') {
+    return undefined
+  }
+
+  var headers = Object.create(null)
+  var keys = Object.keys(err.headers)
+
+  for (var i = 0; i < keys.length; i++) {
+    var key = keys[i]
+    headers[key] = err.headers[key]
+  }
+
+  return headers
 }
 
 /**
@@ -215,6 +235,10 @@ function send (req, res, status, headers, body) {
  */
 
 function setHeaders (res, headers) {
+  if (!headers) {
+    return
+  }
+
   var keys = Object.keys(headers)
   for (var i = 0; i < keys.length; i++) {
     var key = keys[i]
