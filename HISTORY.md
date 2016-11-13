@@ -2,6 +2,7 @@ unreleased
 ==========
 
   * Fix exception when `err.headers` is not an object
+  * deps: statuses@~1.3.1
   * perf: hoist regular expressions
   * perf: remove duplicate validation path
 
