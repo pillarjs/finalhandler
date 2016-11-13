@@ -1,5 +1,5 @@
-unreleased
-==========
+0.5.1 / 2016-11-12
+==================
 
   * Fix exception when `err.headers` is not an object
   * deps: statuses@~1.3.1
