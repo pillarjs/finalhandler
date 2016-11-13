@@ -20,7 +20,7 @@ $ npm install finalhandler
 
 ## API
 
-```js
+```
 var finalhandler = require('finalhandler')
 ```
 
@@ -125,7 +125,7 @@ var server = http.createServer(function (req, res) {
 
 server.listen(3000)
 
-function logerror(err) {
+function logerror (err) {
   console.error(err.stack || err.toString())
 }
 ```
