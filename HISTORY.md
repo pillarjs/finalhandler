@@ -1,3 +1,13 @@
+unreleased
+==========
+
+  * deps: debug@2.6.0
+    - Allow colors in workers
+    - Deprecated `DEBUG_FD` environment variable
+    - Fix error when running under React Native
+    - Use same color for same namespace
+    - deps: ms@0.7.2
+
 0.5.1 / 2016-11-12
 ==================
 
