@@ -182,7 +182,7 @@ describe('finalhandler(req, res)', function () {
   })
 
   describe('404 response', function () {
-    it('include method and path', function (done) {
+    it('should include method and path', function (done) {
       request(createServer())
       .get('/foo')
       .expect(404, 'Cannot GET /foo\n', done)
