@@ -200,6 +200,19 @@ describe('finalhandler(req, res)', function () {
       .expect(404, 'Cannot GET /&lt;la&#39;me&gt;\n', done)
     })
 
+    it('should include original URL', function (done) {
+      var server = createServer(function (req, res, next) {
+        var parts = req.url.split('/')
+        req.originalUrl = req.url
+        req.url = '/' + parts.slice(2).join('/')
+        next()
+      })
+
+      request(server)
+      .get('/foo/bar')
+      .expect(404, 'Cannot GET /foo/bar\n', done)
+    })
+
     it('should handle HEAD', function (done) {
       request(createServer())
       .head('/foo')
