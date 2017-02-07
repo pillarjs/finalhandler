@@ -8,6 +8,7 @@ exports.assert = assert
 exports.createError = createError
 exports.createServer = createServer
 exports.createSlowWriteStream = createSlowWriteStream
+exports.rawrequest = rawrequest
 exports.request = request
 exports.shouldHaveStatusMessage = shouldHaveStatusMessage
 exports.shouldNotHaveHeader = shouldNotHaveHeader
@@ -39,6 +40,65 @@ function createServer (err, opts) {
 
 function createSlowWriteStream () {
   return new SlowWriteStream()
+}
+
+function rawrequest (server) {
+  var _headers = {}
+  var _path
+
+  function expect (status, body, callback) {
+    if (arguments.length === 2) {
+      _headers[status.toLowerCase()] = body
+      return this
+    }
+
+    server.listen(function onlisten () {
+      var addr = this.address()
+      var hostname = addr.family === 'IPv6' ? '::1' : '127.0.0.1'
+      var port = addr.port
+
+      var req = http.get({
+        host: hostname,
+        path: _path,
+        port: port
+      })
+      req.on('response', function onresponse (res) {
+        var buf = ''
+
+        res.setEncoding('utf8')
+        res.on('data', function ondata (s) { buf += s })
+        res.on('end', function onend () {
+          var err = null
+
+          try {
+            for (var key in _headers) {
+              assert.equal(res.headers[key], _headers[key])
+            }
+
+            assert.equal(res.statusCode, status)
+            assert.equal(buf, body)
+          } catch (e) {
+            err = e
+          }
+
+          server.close()
+          callback(err)
+        })
+      })
+    })
+  }
+
+  function get (path) {
+    _path = path
+
+    return {
+      expect: expect
+    }
+  }
+
+  return {
+    get: get
+  }
 }
 
 function shouldHaveStatusMessage (statusMessage) {

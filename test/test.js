@@ -1,13 +1,14 @@
 
-var assert = require('assert')
 var finalhandler = require('..')
 var http = require('http')
-var request = require('supertest')
 var utils = require('./support/utils')
 
+var assert = utils.assert
 var createError = utils.createError
 var createServer = utils.createServer
 var createSlowWriteStream = utils.createSlowWriteStream
+var rawrequest = utils.rawrequest
+var request = utils.request
 var shouldHaveStatusMessage = utils.shouldHaveStatusMessage
 var shouldNotHaveHeader = utils.shouldNotHaveHeader
 
@@ -191,6 +192,12 @@ describe('finalhandler(req, res)', function () {
       request(createServer())
       .get('/foo')
       .expect(404, 'Cannot GET /foo\n', done)
+    })
+
+    it('should escape method and path characters', function (done) {
+      rawrequest(createServer())
+      .get('/<la\'me>')
+      .expect(404, 'Cannot GET /&lt;la&#39;me&gt;\n', done)
     })
 
     it('should handle HEAD', function (done) {
