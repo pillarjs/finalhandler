@@ -3,8 +3,13 @@ var assert = require('assert')
 var finalhandler = require('..')
 var http = require('http')
 var request = require('supertest')
-var stream = require('readable-stream')
-var util = require('util')
+var utils = require('./support/utils')
+
+var createError = utils.createError
+var createServer = utils.createServer
+var createSlowWriteStream = utils.createSlowWriteStream
+var shouldHaveStatusMessage = utils.shouldHaveStatusMessage
+var shouldNotHaveHeader = utils.shouldNotHaveHeader
 
 var describeStatusMessage = !/statusMessage/.test(http.IncomingMessage.toString())
   ? describe.skip
@@ -419,54 +424,3 @@ describe('finalhandler(req, res)', function () {
     })
   })
 })
-
-function createError (message, props) {
-  var err = new Error(message)
-
-  if (props) {
-    for (var prop in props) {
-      err[prop] = props[prop]
-    }
-  }
-
-  return err
-}
-
-function createServer (err, opts) {
-  return http.createServer(function (req, res) {
-    var done = finalhandler(req, res, opts)
-
-    if (typeof err === 'function') {
-      err(req, res, done)
-      return
-    }
-
-    done(err)
-  })
-}
-
-function createSlowWriteStream () {
-  return new SlowWriteStream()
-}
-
-function shouldHaveStatusMessage (statusMessage) {
-  return function (test) {
-    assert.equal(test.res.statusMessage, statusMessage, 'should have statusMessage "' + statusMessage + '"')
-  }
-}
-
-function shouldNotHaveHeader (header) {
-  return function (test) {
-    assert.ok(test.res.headers[header] === undefined, 'response does not have header "' + header + '"')
-  }
-}
-
-function SlowWriteStream () {
-  stream.Writable.call(this)
-}
-
-util.inherits(SlowWriteStream, stream.Writable)
-
-SlowWriteStream.prototype._write = function _write (chunk, encoding, callback) {
-  setTimeout(callback, 1000)
-}
