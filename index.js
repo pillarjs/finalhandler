@@ -14,6 +14,7 @@
 var debug = require('debug')('finalhandler')
 var escapeHtml = require('escape-html')
 var onFinished = require('on-finished')
+var parseUrl = require('parseurl')
 var statuses = require('statuses')
 var unpipe = require('unpipe')
 
@@ -91,7 +92,7 @@ function finalhandler (req, res, options) {
         .replace(DOUBLE_SPACE_REGEXP, ' &nbsp;') + '\n'
     } else {
       status = 404
-      msg = 'Cannot ' + escapeHtml(req.method) + ' ' + escapeHtml(req.originalUrl || req.url) + '\n'
+      msg = 'Cannot ' + escapeHtml(req.method) + ' ' + escapeHtml(parseUrl.original(req).pathname) + '\n'
     }
 
     debug('default %s', status)

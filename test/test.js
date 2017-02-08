@@ -188,19 +188,19 @@ describe('finalhandler(req, res)', function () {
   })
 
   describe('404 response', function () {
-    it('should include method and path', function (done) {
+    it('should include method and pathname', function (done) {
       request(createServer())
       .get('/foo')
       .expect(404, 'Cannot GET /foo\n', done)
     })
 
-    it('should escape method and path characters', function (done) {
+    it('should escape method and pathname characters', function (done) {
       rawrequest(createServer())
       .get('/<la\'me>')
       .expect(404, 'Cannot GET /&lt;la&#39;me&gt;\n', done)
     })
 
-    it('should include original URL', function (done) {
+    it('should include original pathname', function (done) {
       var server = createServer(function (req, res, next) {
         var parts = req.url.split('/')
         req.originalUrl = req.url
@@ -211,6 +211,12 @@ describe('finalhandler(req, res)', function () {
       request(server)
       .get('/foo/bar')
       .expect(404, 'Cannot GET /foo/bar\n', done)
+    })
+
+    it('should include pathname only', function (done) {
+      rawrequest(createServer())
+      .get('http://localhost/foo?bar=1')
+      .expect(404, 'Cannot GET /foo\n', done)
     })
 
     it('should handle HEAD', function (done) {

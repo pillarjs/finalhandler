@@ -1,6 +1,7 @@
 unreleased
 ==========
 
+  * Only include the pathname in the 404 message
   * deps: debug@2.6.0
     - Allow colors in workers
     - Deprecated `DEBUG_FD` environment variable
