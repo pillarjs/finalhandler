@@ -197,7 +197,13 @@ describe('finalhandler(req, res)', function () {
     it('should escape method and pathname characters', function (done) {
       rawrequest(createServer())
       .get('/<la\'me>')
-      .expect(404, 'Cannot GET /&lt;la&#39;me&gt;\n', done)
+      .expect(404, 'Cannot GET /%3Cla&#39;me%3E\n', done)
+    })
+
+    it('should encode bad pathname characters', function (done) {
+      rawrequest(createServer())
+      .get('/foo%20§')
+      .expect(404, 'Cannot GET /foo%20%C2%A7\n', done)
     })
 
     it('should include original pathname', function (done) {
