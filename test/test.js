@@ -99,6 +99,14 @@ describe('finalhandler(req, res)', function () {
       .expect(400, done)
     })
 
+    it('should ignore non-error err.statusCode code', function (done) {
+      request(createServer(createError('created', {
+        statusCode: 201
+      })))
+      .get('/')
+      .expect(500, done)
+    })
+
     it('should ignore non-numeric err.statusCode', function (done) {
       request(createServer(createError('oops', {
         statusCode: 'oh no'
@@ -147,6 +155,14 @@ describe('finalhandler(req, res)', function () {
       })))
       .get('/')
       .expect(410, done)
+    })
+
+    it('should ignore non-error err.status code', function (done) {
+      request(createServer(createError('created', {
+        status: 201
+      })))
+      .get('/')
+      .expect(500, done)
     })
 
     it('should ignore non-numeric err.status', function (done) {
