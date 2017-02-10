@@ -61,6 +61,7 @@ function finalhandler (req, res, options) {
 
   return function (err) {
     var headers
+    var msg
     var status
 
     // ignore 404 on in-flight response
@@ -84,14 +85,12 @@ function finalhandler (req, res, options) {
         status = getResponseStatusCode(res)
       }
 
-      // production gets a basic error message
-      var msg = env === 'production'
-        ? statuses[status]
-        : err.stack || err.toString()
-      msg = escapeHtml(msg)
+      // get error message
+      msg = escapeHtml(getErrorMessage(err, status, env))
         .replace(NEWLINE_REGEXP, '<br>')
         .replace(DOUBLE_SPACE_REGEXP, ' &nbsp;') + '\n'
     } else {
+      // not found
       status = 404
       msg = 'Cannot ' + escapeHtml(req.method) +
         ' ' + escapeHtml(encodeUrl(parseUrl.original(req).pathname)) + '\n'
@@ -138,6 +137,32 @@ function getErrorHeaders (err) {
   }
 
   return headers
+}
+
+/**
+ * Get message from Error object, fallback to status message.
+ *
+ * @param {Error} err
+ * @param {number} status
+ * @param {string} env
+ * @return {string}
+ * @private
+ */
+
+function getErrorMessage (err, status, env) {
+  var msg
+
+  if (env !== 'production') {
+    // use err.stack, which typically includes err.message
+    msg = err.stack
+
+    // fallback to err.toString() when possible
+    if (!msg && typeof err.toString === 'function') {
+      msg = err.toString()
+    }
+  }
+
+  return msg || statuses[status]
 }
 
 /**

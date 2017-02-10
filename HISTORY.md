@@ -1,6 +1,7 @@
 unreleased
 ==========
 
+  * Fix exception when `err` cannot be converted to a string
   * Fully URL-encode the pathname in the 404 message
   * Only include the pathname in the 404 message
   * deps: debug@2.6.0

@@ -300,6 +300,12 @@ describe('finalhandler(req, res)', function () {
       .expect(500, 'lame string\n', done)
     })
 
+    it('should handle null prototype objects', function (done) {
+      request(createServer(Object.create(null)))
+      .get('/foo')
+      .expect(500, 'Internal Server Error\n', done)
+    })
+
     it('should send staus code name when production', function (done) {
       var err = createError('boom!', {
         status: 501
