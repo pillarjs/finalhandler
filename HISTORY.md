@@ -4,9 +4,9 @@ unreleased
   * Fix exception when `err` cannot be converted to a string
   * Fully URL-encode the pathname in the 404 message
   * Only include the pathname in the 404 message
-  * deps: debug@2.6.0
+  * deps: debug@2.6.1
     - Allow colors in workers
-    - Deprecated `DEBUG_FD` environment variable
+    - Deprecated `DEBUG_FD` environment variable set to `3` or higher
     - Fix error when running under React Native
     - Use same color for same namespace
     - deps: ms@0.7.2
