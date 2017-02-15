@@ -4,6 +4,7 @@ unreleased
   * Fix exception when `err` cannot be converted to a string
   * Fully URL-encode the pathname in the 404 message
   * Only include the pathname in the 404 message
+  * Send complete HTML document
   * deps: debug@2.6.1
     - Allow colors in workers
     - Deprecated `DEBUG_FD` environment variable set to `3` or higher

@@ -215,19 +215,19 @@ describe('finalhandler(req, res)', function () {
     it('should include method and pathname', function (done) {
       request(createServer())
       .get('/foo')
-      .expect(404, 'Cannot GET /foo\n', done)
+      .expect(404, /<pre>Cannot GET \/foo<\/pre>/, done)
     })
 
     it('should escape method and pathname characters', function (done) {
       rawrequest(createServer())
       .get('/<la\'me>')
-      .expect(404, 'Cannot GET /%3Cla&#39;me%3E\n', done)
+      .expect(404, /<pre>Cannot GET \/%3Cla&#39;me%3E<\/pre>/, done)
     })
 
     it('should encode bad pathname characters', function (done) {
       rawrequest(createServer())
       .get('/foo%20§')
-      .expect(404, 'Cannot GET /foo%20%C2%A7\n', done)
+      .expect(404, /<pre>Cannot GET \/foo%20%C2%A7<\/pre>/, done)
     })
 
     it('should include original pathname', function (done) {
@@ -240,13 +240,13 @@ describe('finalhandler(req, res)', function () {
 
       request(server)
       .get('/foo/bar')
-      .expect(404, 'Cannot GET /foo/bar\n', done)
+      .expect(404, /<pre>Cannot GET \/foo\/bar<\/pre>/, done)
     })
 
     it('should include pathname only', function (done) {
       rawrequest(createServer())
       .get('http://localhost/foo?bar=1')
-      .expect(404, 'Cannot GET /foo\n', done)
+      .expect(404, /<pre>Cannot GET \/foo<\/pre>/, done)
     })
 
     it('should handle HEAD', function (done) {
@@ -278,7 +278,7 @@ describe('finalhandler(req, res)', function () {
     it('should include error stack', function (done) {
       request(createServer(createError('boom!')))
       .get('/foo')
-      .expect(500, /^Error: boom!<br> &nbsp; &nbsp;at/, done)
+      .expect(500, /<pre>Error: boom!<br> &nbsp; &nbsp;at/, done)
     })
 
     it('should handle HEAD', function (done) {
@@ -297,13 +297,13 @@ describe('finalhandler(req, res)', function () {
     it('should handle non-error-objects', function (done) {
       request(createServer('lame string'))
       .get('/foo')
-      .expect(500, 'lame string\n', done)
+      .expect(500, /<pre>lame string<\/pre>/, done)
     })
 
     it('should handle null prototype objects', function (done) {
       request(createServer(Object.create(null)))
       .get('/foo')
-      .expect(500, 'Internal Server Error\n', done)
+      .expect(500, /<pre>Internal Server Error<\/pre>/, done)
     })
 
     it('should send staus code name when production', function (done) {
@@ -314,7 +314,7 @@ describe('finalhandler(req, res)', function () {
         env: 'production'
       }))
       .get('/foo')
-      .expect(501, 'Not Implemented\n', done)
+      .expect(501, /<pre>Not Implemented<\/pre>/, done)
     })
 
     describe('when there is a request body', function () {
@@ -412,7 +412,7 @@ describe('finalhandler(req, res)', function () {
           env: 'production'
         }))
         .get('/foo')
-        .expect(509, 'Bandwidth Limit Exceeded\n', done)
+        .expect(509, /<pre>Bandwidth Limit Exceeded<\/pre>/, done)
       })
     })
 

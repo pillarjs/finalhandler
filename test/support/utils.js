@@ -76,7 +76,12 @@ function rawrequest (server) {
             }
 
             assert.equal(res.statusCode, status)
-            assert.equal(buf, body)
+
+            if (body instanceof RegExp) {
+              assert.ok(body.test(buf), 'expected body ' + buf + ' to match ' + body)
+            } else {
+              assert.equal(buf, body, 'expected ' + body + ' response body, got ' + buf)
+            }
           } catch (e) {
             err = e
           }

@@ -34,6 +34,29 @@ var defer = typeof setImmediate === 'function'
 var isFinished = onFinished.isFinished
 
 /**
+ * Create a minimal HTML document.
+ *
+ * @param {string} message
+ * @private
+ */
+
+function createHtmlDocument (message) {
+  var body = escapeHtml(message)
+    .replace(NEWLINE_REGEXP, '<br>')
+    .replace(DOUBLE_SPACE_REGEXP, ' &nbsp;')
+
+  return '<!DOCTYPE html>\n' +
+    '<html lang="en">\n' +
+    '<head>\n' +
+    '<meta charset="utf-8">\n' +
+    '<title>Error</title>\n' +
+    '</head>\n' +
+    '<body>\n' +
+    '<pre>' + body + '</pre>\n' +
+    '</body>\n'
+}
+
+/**
  * Module exports.
  * @public
  */
@@ -86,14 +109,11 @@ function finalhandler (req, res, options) {
       }
 
       // get error message
-      msg = escapeHtml(getErrorMessage(err, status, env))
-        .replace(NEWLINE_REGEXP, '<br>')
-        .replace(DOUBLE_SPACE_REGEXP, ' &nbsp;') + '\n'
+      msg = getErrorMessage(err, status, env)
     } else {
       // not found
       status = 404
-      msg = 'Cannot ' + escapeHtml(req.method) +
-        ' ' + escapeHtml(encodeUrl(parseUrl.original(req).pathname)) + '\n'
+      msg = 'Cannot ' + req.method + ' ' + encodeUrl(parseUrl.original(req).pathname)
     }
 
     debug('default %s', status)
@@ -213,12 +233,15 @@ function getResponseStatusCode (res) {
  * @param {OutgoingMessage} res
  * @param {number} status
  * @param {object} headers
- * @param {string} body
+ * @param {string} message
  * @private
  */
 
-function send (req, res, status, headers, body) {
+function send (req, res, status, headers, message) {
   function write () {
+    // response body
+    var body = createHtmlDocument(message)
+
     // response status
     res.statusCode = status
     res.statusMessage = statuses[status]
