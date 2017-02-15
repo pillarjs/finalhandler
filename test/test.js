@@ -255,10 +255,17 @@ describe('finalhandler(req, res)', function () {
       .expect(404, '', done)
     })
 
-    it('should include security header', function (done) {
+    it('should include X-Content-Type-Options header', function (done) {
       request(createServer())
       .get('/foo')
       .expect('X-Content-Type-Options', 'nosniff')
+      .expect(404, done)
+    })
+
+    it('should includeContent-Security-Policy header', function (done) {
+      request(createServer())
+      .get('/foo')
+      .expect('Content-Security-Policy', "default-src 'self'")
       .expect(404, done)
     })
 
@@ -287,10 +294,17 @@ describe('finalhandler(req, res)', function () {
       .expect(404, '', done)
     })
 
-    it('should include security header', function (done) {
+    it('should include X-Content-Type-Options header', function (done) {
       request(createServer(createError('boom!')))
       .get('/foo')
       .expect('X-Content-Type-Options', 'nosniff')
+      .expect(500, done)
+    })
+
+    it('should includeContent-Security-Policy header', function (done) {
+      request(createServer(createError('boom!')))
+      .get('/foo')
+      .expect('Content-Security-Policy', "default-src 'self'")
       .expect(500, done)
     })
 
