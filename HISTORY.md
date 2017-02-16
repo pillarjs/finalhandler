@@ -1,5 +1,5 @@
-unreleased
-==========
+1.0.0 / 2017-02-15
+==================
 
   * Fix exception when `err` cannot be converted to a string
   * Fully URL-encode the pathname in the 404 message
