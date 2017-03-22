@@ -1,5 +1,5 @@
-unreleased
-==========
+1.0.1 / 2017-03-21
+==================
 
   * Fix missing `</html>` in HTML document
   * deps: debug@2.6.3
