@@ -1,6 +1,7 @@
 unreleased
 ==========
 
+  * Fix missing `</html>` in HTML document
   * deps: debug@2.6.3
     - Fix: `DEBUG_MAX_ARRAY_LENGTH`
 
