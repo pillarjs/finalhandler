@@ -24,7 +24,7 @@
     "eslint-plugin-standard": "3.0.1",
     "istanbul": "0.4.5",
     "mocha": "2.5.3",
-    "readable-stream": "2.1.2",
+    "readable-stream": "2.2.9",
     "safe-buffer": "5.0.1",
     "supertest": "1.1.0"
   },
