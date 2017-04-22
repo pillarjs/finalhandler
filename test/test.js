@@ -1,4 +1,5 @@
 
+var Buffer = require('safe-buffer').Buffer
 var finalhandler = require('..')
 var http = require('http')
 var utils = require('./support/utils')
@@ -270,10 +271,9 @@ describe('finalhandler(req, res)', function () {
     })
 
     it('should not hang/error if there is a request body', function (done) {
-      var buf = new Buffer(1024 * 16)
+      var buf = Buffer.alloc(1024 * 16, '.')
       var server = createServer()
       var test = request(server).post('/foo')
-      buf.fill('.')
       test.write(buf)
       test.write(buf)
       test.write(buf)
@@ -333,10 +333,9 @@ describe('finalhandler(req, res)', function () {
 
     describe('when there is a request body', function () {
       it('should not hang/error when unread', function (done) {
-        var buf = new Buffer(1024 * 16)
+        var buf = Buffer.alloc(1024 * 16, '.')
         var server = createServer(new Error('boom!'))
         var test = request(server).post('/foo')
-        buf.fill('.')
         test.write(buf)
         test.write(buf)
         test.write(buf)
@@ -344,7 +343,7 @@ describe('finalhandler(req, res)', function () {
       })
 
       it('should not hang/error when actively piped', function (done) {
-        var buf = new Buffer(1024 * 16)
+        var buf = Buffer.alloc(1024 * 16, '.')
         var server = createServer(function (req, res, next) {
           req.pipe(stream)
           process.nextTick(function () {
@@ -353,7 +352,6 @@ describe('finalhandler(req, res)', function () {
         })
         var stream = createSlowWriteStream()
         var test = request(server).post('/foo')
-        buf.fill('.')
         test.write(buf)
         test.write(buf)
         test.write(buf)
@@ -361,7 +359,7 @@ describe('finalhandler(req, res)', function () {
       })
 
       it('should not hang/error when read', function (done) {
-        var buf = new Buffer(1024 * 16)
+        var buf = Buffer.alloc(1024 * 16, '.')
         var server = createServer(function (req, res, next) {
           // read off the request
           req.once('end', function () {
@@ -370,7 +368,6 @@ describe('finalhandler(req, res)', function () {
           req.resume()
         })
         var test = request(server).post('/foo')
-        buf.fill('.')
         test.write(buf)
         test.write(buf)
         test.write(buf)
