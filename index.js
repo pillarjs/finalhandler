@@ -87,9 +87,10 @@ function finalhandler (req, res, options) {
     var headers
     var msg
     var status
+    var headersSent = res.headersSent || res._header
 
     // ignore 404 on in-flight response
-    if (!err && res._header) {
+    if (!err && headersSent) {
       debug('cannot 404 after headers sent')
       return
     }
@@ -125,7 +126,7 @@ function finalhandler (req, res, options) {
     }
 
     // cannot actually respond
-    if (res._header) {
+    if (headersSent) {
       debug('cannot %d after headers sent', status)
       req.socket.destroy()
       return
