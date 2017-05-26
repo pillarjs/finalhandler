@@ -263,10 +263,20 @@ describe('finalhandler(req, res)', function () {
       .expect(404, done)
     })
 
-    it('should includeContent-Security-Policy header', function (done) {
+    it('should include Content-Security-Policy header', function (done) {
       request(createServer())
       .get('/foo')
       .expect('Content-Security-Policy', "default-src 'self'")
+      .expect(404, done)
+    })
+
+    it('should not include Content-Security-Policy header if already set', function (done) {
+      request(createServer(function (req, res, next) {
+        res.setHeader('Content-Security-Policy', "frame-ancestors 'self'")
+        next()
+      }))
+      .get('/foo')
+      .expect('Content-Security-Policy', "frame-ancestors 'self'")
       .expect(404, done)
     })
 
