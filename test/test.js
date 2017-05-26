@@ -270,7 +270,7 @@ describe('finalhandler(req, res)', function () {
       .expect(404, done)
     })
 
-    it('should node include Content-Security-Policy header if already set', function (done) {
+    it('should not include Content-Security-Policy header if already set', function (done) {
       request(createServer(function (req, res, next) {
         res.setHeader('Content-Security-Policy', "frame-ancestors 'self'")
         next()
