@@ -1,7 +1,7 @@
 {
   "name": "finalhandler",
   "description": "Node.js final http responder",
-  "version": "1.0.4",
+  "version": "1.0.5",
   "author": "Douglas Christopher Wilson <doug@somethingdoug.com>",
   "license": "MIT",
   "repository": "pillarjs/finalhandler",

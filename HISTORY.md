@@ -1,5 +1,5 @@
-unreleased
-==========
+1.0.5 / 2017-09-15
+==================
 
   * deps: parseurl@~1.3.2
     - perf: reduce overhead for full URLs
