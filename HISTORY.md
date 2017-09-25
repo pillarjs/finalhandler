@@ -1,5 +1,5 @@
-unreleased
-==========
+1.1.0 / 2017-09-24
+==================
 
   * Use `res.headersSent` when available
 
