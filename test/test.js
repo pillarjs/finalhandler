@@ -477,6 +477,23 @@ describe('finalhandler(req, res)', function () {
       .get('/foo')
       .expect(301, '0', done)
     })
+
+    it('should not socket hang up', function (done) {
+      var responseBody = Buffer.alloc(1024 * 1024, 'test').toString()
+      var server = http.createServer(function (req, res) {
+        var done = finalhandler(req, res)
+        res.statusCode = 301
+        res.end(responseBody)
+        done(createError('too many requests', {
+          status: 429,
+          headers: {'Retry-After': '5'}
+        }))
+      })
+
+      request(server)
+        .get('/foo')
+        .expect(301, responseBody, done)
+    })
   })
 
   describe('onerror', function () {
