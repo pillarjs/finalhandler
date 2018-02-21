@@ -23,9 +23,9 @@ describe('finalhandler(req, res)', function () {
       request(createServer(createError('oops!', {
         headers: {'X-Custom-Header': 'foo'}
       })))
-      .get('/')
-      .expect(shouldNotHaveHeader('X-Custom-Header'))
-      .expect(500, done)
+        .get('/')
+        .expect(shouldNotHaveHeader('X-Custom-Header'))
+        .expect(500, done)
     })
 
     it('should ignore err.headers with invalid res.status', function (done) {
@@ -33,9 +33,9 @@ describe('finalhandler(req, res)', function () {
         headers: {'X-Custom-Header': 'foo'},
         status: 601
       })))
-      .get('/')
-      .expect(shouldNotHaveHeader('X-Custom-Header'))
-      .expect(500, done)
+        .get('/')
+        .expect(shouldNotHaveHeader('X-Custom-Header'))
+        .expect(500, done)
     })
 
     it('should ignore err.headers with invalid res.statusCode', function (done) {
@@ -43,9 +43,9 @@ describe('finalhandler(req, res)', function () {
         headers: {'X-Custom-Header': 'foo'},
         statusCode: 601
       })))
-      .get('/')
-      .expect(shouldNotHaveHeader('X-Custom-Header'))
-      .expect(500, done)
+        .get('/')
+        .expect(shouldNotHaveHeader('X-Custom-Header'))
+        .expect(500, done)
     })
 
     it('should include err.headers with err.status', function (done) {
@@ -53,10 +53,10 @@ describe('finalhandler(req, res)', function () {
         headers: {'X-Custom-Header': 'foo=500', 'X-Custom-Header2': 'bar'},
         status: 500
       })))
-      .get('/')
-      .expect('X-Custom-Header', 'foo=500')
-      .expect('X-Custom-Header2', 'bar')
-      .expect(500, done)
+        .get('/')
+        .expect('X-Custom-Header', 'foo=500')
+        .expect('X-Custom-Header2', 'bar')
+        .expect(500, done)
     })
 
     it('should include err.headers with err.statusCode', function (done) {
@@ -64,9 +64,9 @@ describe('finalhandler(req, res)', function () {
         headers: {'Retry-After': '5'},
         statusCode: 429
       })))
-      .get('/')
-      .expect('Retry-After', '5')
-      .expect(429, done)
+        .get('/')
+        .expect('Retry-After', '5')
+        .expect(429, done)
     })
 
     it('should ignore err.headers when not an object', function (done) {
@@ -74,54 +74,54 @@ describe('finalhandler(req, res)', function () {
         headers: 'foobar',
         statusCode: 500
       })))
-      .get('/')
-      .expect(500, done)
+        .get('/')
+        .expect(500, done)
     })
   })
 
   describe('status code', function () {
     it('should 404 on no error', function (done) {
       request(createServer())
-      .get('/')
-      .expect(404, done)
+        .get('/')
+        .expect(404, done)
     })
 
     it('should 500 on error', function (done) {
       request(createServer(createError()))
-      .get('/')
-      .expect(500, done)
+        .get('/')
+        .expect(500, done)
     })
 
     it('should use err.statusCode', function (done) {
       request(createServer(createError('nope', {
         statusCode: 400
       })))
-      .get('/')
-      .expect(400, done)
+        .get('/')
+        .expect(400, done)
     })
 
     it('should ignore non-error err.statusCode code', function (done) {
       request(createServer(createError('created', {
         statusCode: 201
       })))
-      .get('/')
-      .expect(500, done)
+        .get('/')
+        .expect(500, done)
     })
 
     it('should ignore non-numeric err.statusCode', function (done) {
       request(createServer(createError('oops', {
         statusCode: 'oh no'
       })))
-      .get('/')
-      .expect(500, done)
+        .get('/')
+        .expect(500, done)
     })
 
     it('should use err.status', function (done) {
       request(createServer(createError('nope', {
         status: 400
       })))
-      .get('/')
-      .expect(400, done)
+        .get('/')
+        .expect(400, done)
     })
 
     it('should use err.status over err.statusCode', function (done) {
@@ -129,24 +129,24 @@ describe('finalhandler(req, res)', function () {
         status: 400,
         statusCode: 401
       })))
-      .get('/')
-      .expect(400, done)
+        .get('/')
+        .expect(400, done)
     })
 
     it('should set status to 500 when err.status < 400', function (done) {
       request(createServer(createError('oops', {
         status: 202
       })))
-      .get('/')
-      .expect(500, done)
+        .get('/')
+        .expect(500, done)
     })
 
     it('should set status to 500 when err.status > 599', function (done) {
       request(createServer(createError('oops', {
         status: 601
       })))
-      .get('/')
-      .expect(500, done)
+        .get('/')
+        .expect(500, done)
     })
 
     it('should use err.statusCode over invalid err.status', function (done) {
@@ -154,49 +154,49 @@ describe('finalhandler(req, res)', function () {
         status: 50,
         statusCode: 410
       })))
-      .get('/')
-      .expect(410, done)
+        .get('/')
+        .expect(410, done)
     })
 
     it('should ignore non-error err.status code', function (done) {
       request(createServer(createError('created', {
         status: 201
       })))
-      .get('/')
-      .expect(500, done)
+        .get('/')
+        .expect(500, done)
     })
 
     it('should ignore non-numeric err.status', function (done) {
       request(createServer(createError('oops', {
         status: 'oh no'
       })))
-      .get('/')
-      .expect(500, done)
+        .get('/')
+        .expect(500, done)
     })
   })
 
   describeStatusMessage('status message', function () {
     it('should be "Not Found" on no error', function (done) {
       request(createServer())
-      .get('/')
-      .expect(shouldHaveStatusMessage('Not Found'))
-      .expect(404, done)
+        .get('/')
+        .expect(shouldHaveStatusMessage('Not Found'))
+        .expect(404, done)
     })
 
     it('should be "Internal Server Error" on error', function (done) {
       request(createServer(createError()))
-      .get('/')
-      .expect(shouldHaveStatusMessage('Internal Server Error'))
-      .expect(500, done)
+        .get('/')
+        .expect(shouldHaveStatusMessage('Internal Server Error'))
+        .expect(500, done)
     })
 
     it('should be "Bad Request" when err.statusCode = 400', function (done) {
       request(createServer(createError('oops', {
         status: 400
       })))
-      .get('/')
-      .expect(shouldHaveStatusMessage('Bad Request'))
-      .expect(400, done)
+        .get('/')
+        .expect(shouldHaveStatusMessage('Bad Request'))
+        .expect(400, done)
     })
 
     it('should reset existing res.statusMessage', function (done) {
@@ -206,29 +206,29 @@ describe('finalhandler(req, res)', function () {
       }
 
       request(createServer(onRequest))
-      .get('/')
-      .expect(shouldHaveStatusMessage('Internal Server Error'))
-      .expect(500, done)
+        .get('/')
+        .expect(shouldHaveStatusMessage('Internal Server Error'))
+        .expect(500, done)
     })
   })
 
   describe('404 response', function () {
     it('should include method and pathname', function (done) {
       request(createServer())
-      .get('/foo')
-      .expect(404, /<pre>Cannot GET \/foo<\/pre>/, done)
+        .get('/foo')
+        .expect(404, /<pre>Cannot GET \/foo<\/pre>/, done)
     })
 
     it('should escape method and pathname characters', function (done) {
       rawrequest(createServer())
-      .get('/<la\'me>')
-      .expect(404, /<pre>Cannot GET \/%3Cla&#39;me%3E<\/pre>/, done)
+        .get('/<la\'me>')
+        .expect(404, /<pre>Cannot GET \/%3Cla&#39;me%3E<\/pre>/, done)
     })
 
     it('should encode bad pathname characters', function (done) {
       rawrequest(createServer())
-      .get('/foo%20§')
-      .expect(404, /<pre>Cannot GET \/foo%20%C2%A7<\/pre>/, done)
+        .get('/foo%20§')
+        .expect(404, /<pre>Cannot GET \/foo%20%C2%A7<\/pre>/, done)
     })
 
     it('should include original pathname', function (done) {
@@ -240,34 +240,34 @@ describe('finalhandler(req, res)', function () {
       })
 
       request(server)
-      .get('/foo/bar')
-      .expect(404, /<pre>Cannot GET \/foo\/bar<\/pre>/, done)
+        .get('/foo/bar')
+        .expect(404, /<pre>Cannot GET \/foo\/bar<\/pre>/, done)
     })
 
     it('should include pathname only', function (done) {
       rawrequest(createServer())
-      .get('http://localhost/foo?bar=1')
-      .expect(404, /<pre>Cannot GET \/foo<\/pre>/, done)
+        .get('http://localhost/foo?bar=1')
+        .expect(404, /<pre>Cannot GET \/foo<\/pre>/, done)
     })
 
     it('should handle HEAD', function (done) {
       request(createServer())
-      .head('/foo')
-      .expect(404, '', done)
+        .head('/foo')
+        .expect(404, '', done)
     })
 
     it('should include X-Content-Type-Options header', function (done) {
       request(createServer())
-      .get('/foo')
-      .expect('X-Content-Type-Options', 'nosniff')
-      .expect(404, done)
+        .get('/foo')
+        .expect('X-Content-Type-Options', 'nosniff')
+        .expect(404, done)
     })
 
     it('should includeContent-Security-Policy header', function (done) {
       request(createServer())
-      .get('/foo')
-      .expect('Content-Security-Policy', "default-src 'self'")
-      .expect(404, done)
+        .get('/foo')
+        .expect('Content-Security-Policy', "default-src 'self'")
+        .expect(404, done)
     })
 
     it('should not hang/error if there is a request body', function (done) {
@@ -284,40 +284,40 @@ describe('finalhandler(req, res)', function () {
   describe('error response', function () {
     it('should include error stack', function (done) {
       request(createServer(createError('boom!')))
-      .get('/foo')
-      .expect(500, /<pre>Error: boom!<br> &nbsp; &nbsp;at/, done)
+        .get('/foo')
+        .expect(500, /<pre>Error: boom!<br> &nbsp; &nbsp;at/, done)
     })
 
     it('should handle HEAD', function (done) {
       request(createServer())
-      .head('/foo')
-      .expect(404, '', done)
+        .head('/foo')
+        .expect(404, '', done)
     })
 
     it('should include X-Content-Type-Options header', function (done) {
       request(createServer(createError('boom!')))
-      .get('/foo')
-      .expect('X-Content-Type-Options', 'nosniff')
-      .expect(500, done)
+        .get('/foo')
+        .expect('X-Content-Type-Options', 'nosniff')
+        .expect(500, done)
     })
 
     it('should includeContent-Security-Policy header', function (done) {
       request(createServer(createError('boom!')))
-      .get('/foo')
-      .expect('Content-Security-Policy', "default-src 'self'")
-      .expect(500, done)
+        .get('/foo')
+        .expect('Content-Security-Policy', "default-src 'self'")
+        .expect(500, done)
     })
 
     it('should handle non-error-objects', function (done) {
       request(createServer('lame string'))
-      .get('/foo')
-      .expect(500, /<pre>lame string<\/pre>/, done)
+        .get('/foo')
+        .expect(500, /<pre>lame string<\/pre>/, done)
     })
 
     it('should handle null prototype objects', function (done) {
       request(createServer(Object.create(null)))
-      .get('/foo')
-      .expect(500, /<pre>Internal Server Error<\/pre>/, done)
+        .get('/foo')
+        .expect(500, /<pre>Internal Server Error<\/pre>/, done)
     })
 
     it('should send staus code name when production', function (done) {
@@ -327,8 +327,8 @@ describe('finalhandler(req, res)', function () {
       request(createServer(err, {
         env: 'production'
       }))
-      .get('/foo')
-      .expect(501, /<pre>Not Implemented<\/pre>/, done)
+        .get('/foo')
+        .expect(501, /<pre>Not Implemented<\/pre>/, done)
     })
 
     describe('when there is a request body', function () {
@@ -384,8 +384,8 @@ describe('finalhandler(req, res)', function () {
         })
 
         request(server)
-        .get('/foo')
-        .expect(503, done)
+          .get('/foo')
+          .expect(503, done)
       })
 
       it('should convert to 500 is not a number', function (done) {
@@ -396,8 +396,8 @@ describe('finalhandler(req, res)', function () {
         })
 
         request(server)
-        .get('/foo')
-        .expect(500, done)
+          .get('/foo')
+          .expect(500, done)
       })
 
       it('should override with err.status', function (done) {
@@ -411,8 +411,8 @@ describe('finalhandler(req, res)', function () {
         })
 
         request(server)
-        .get('/foo')
-        .expect(414, done)
+          .get('/foo')
+          .expect(414, done)
       })
 
       it('should default body to status message in production', function (done) {
@@ -422,8 +422,8 @@ describe('finalhandler(req, res)', function () {
         request(createServer(err, {
           env: 'production'
         }))
-        .get('/foo')
-        .expect(509, /<pre>Bandwidth Limit Exceeded<\/pre>/, done)
+          .get('/foo')
+          .expect(509, /<pre>Bandwidth Limit Exceeded<\/pre>/, done)
       })
     })
 
@@ -436,8 +436,8 @@ describe('finalhandler(req, res)', function () {
         })
 
         request(server)
-        .get('/foo')
-        .expect(500, done)
+          .get('/foo')
+          .expect(500, done)
       })
     })
   })
@@ -455,8 +455,8 @@ describe('finalhandler(req, res)', function () {
       })
 
       request(server)
-      .get('/foo')
-      .expect(301, '01', done)
+        .get('/foo')
+        .expect(301, '01', done)
     })
 
     it('should terminate on error', function (done) {
@@ -474,8 +474,8 @@ describe('finalhandler(req, res)', function () {
       })
 
       request(server)
-      .get('/foo')
-      .expect(301, '0', done)
+        .get('/foo')
+        .expect(301, '0', done)
     })
   })
 
@@ -489,11 +489,11 @@ describe('finalhandler(req, res)', function () {
       }
 
       request(createServer(err, {onerror: log}))
-      .get('/')
-      .end(function () {
-        assert.equal(error, err)
-        done()
-      })
+        .get('/')
+        .end(function () {
+          assert.equal(error, err)
+          done()
+        })
     })
   })
 })
