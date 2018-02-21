@@ -1,3 +1,9 @@
+unreleased
+==========
+
+  * deps: encodeurl@~1.0.2
+    - Fix encoding `%` as last character
+
 1.1.0 / 2017-09-24
 ==================
 
