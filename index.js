@@ -99,14 +99,12 @@ function finalhandler (req, res, options) {
       // respect status code from error
       status = getErrorStatusCode(err)
 
-      // respect headers from error
-      if (status !== undefined) {
-        headers = getErrorHeaders(err)
-      }
-
-      // fallback to status code on response
       if (status === undefined) {
+        // fallback to status code on response
         status = getResponseStatusCode(res)
+      } else {
+        // respect headers from error
+        headers = getErrorHeaders(err)
       }
 
       // get error message
