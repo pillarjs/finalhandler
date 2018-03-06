@@ -61,6 +61,7 @@ function rawrequest (server) {
         path: _path,
         port: port
       })
+      req.on('error', callback)
       req.on('response', function onresponse (res) {
         var buf = ''
 

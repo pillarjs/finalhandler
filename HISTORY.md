@@ -1,6 +1,7 @@
 unreleased
 ==========
 
+  * Fix 404 output for bad / missing pathnames
   * deps: encodeurl@~1.0.2
     - Fix encoding `%` as last character
   * deps: statuses@~1.4.0
