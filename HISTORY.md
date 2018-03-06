@@ -1,5 +1,5 @@
-unreleased
-==========
+1.1.1 / 2018-03-06
+==================
 
   * Fix 404 output for bad / missing pathnames
   * deps: encodeurl@~1.0.2
