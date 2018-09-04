@@ -72,15 +72,15 @@ function rawrequest (server) {
 
           try {
             for (var key in _headers) {
-              assert.equal(res.headers[key], _headers[key])
+              assert.strictEqual(res.headers[key], _headers[key])
             }
 
-            assert.equal(res.statusCode, status)
+            assert.strictEqual(res.statusCode, status)
 
             if (body instanceof RegExp) {
               assert.ok(body.test(buf), 'expected body ' + buf + ' to match ' + body)
             } else {
-              assert.equal(buf, body, 'expected ' + body + ' response body, got ' + buf)
+              assert.strictEqual(buf, body, 'expected ' + body + ' response body, got ' + buf)
             }
           } catch (e) {
             err = e
@@ -108,7 +108,7 @@ function rawrequest (server) {
 
 function shouldHaveStatusMessage (statusMessage) {
   return function (test) {
-    assert.equal(test.res.statusMessage, statusMessage, 'should have statusMessage "' + statusMessage + '"')
+    assert.strictEqual(test.res.statusMessage, statusMessage, 'should have statusMessage "' + statusMessage + '"')
   }
 }
 

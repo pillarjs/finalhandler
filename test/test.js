@@ -21,7 +21,7 @@ describe('finalhandler(req, res)', function () {
   describe('headers', function () {
     it('should ignore err.headers without status code', function (done) {
       request(createServer(createError('oops!', {
-        headers: {'X-Custom-Header': 'foo'}
+        headers: { 'X-Custom-Header': 'foo' }
       })))
         .get('/')
         .expect(shouldNotHaveHeader('X-Custom-Header'))
@@ -30,7 +30,7 @@ describe('finalhandler(req, res)', function () {
 
     it('should ignore err.headers with invalid res.status', function (done) {
       request(createServer(createError('oops!', {
-        headers: {'X-Custom-Header': 'foo'},
+        headers: { 'X-Custom-Header': 'foo' },
         status: 601
       })))
         .get('/')
@@ -40,7 +40,7 @@ describe('finalhandler(req, res)', function () {
 
     it('should ignore err.headers with invalid res.statusCode', function (done) {
       request(createServer(createError('oops!', {
-        headers: {'X-Custom-Header': 'foo'},
+        headers: { 'X-Custom-Header': 'foo' },
         statusCode: 601
       })))
         .get('/')
@@ -50,7 +50,7 @@ describe('finalhandler(req, res)', function () {
 
     it('should include err.headers with err.status', function (done) {
       request(createServer(createError('oops!', {
-        headers: {'X-Custom-Header': 'foo=500', 'X-Custom-Header2': 'bar'},
+        headers: { 'X-Custom-Header': 'foo=500', 'X-Custom-Header2': 'bar' },
         status: 500
       })))
         .get('/')
@@ -61,7 +61,7 @@ describe('finalhandler(req, res)', function () {
 
     it('should include err.headers with err.statusCode', function (done) {
       request(createServer(createError('too many requests', {
-        headers: {'Retry-After': '5'},
+        headers: { 'Retry-After': '5' },
         statusCode: 429
       })))
         .get('/')
@@ -478,7 +478,7 @@ describe('finalhandler(req, res)', function () {
         process.nextTick(function () {
           done(createError('too many requests', {
             status: 429,
-            headers: {'Retry-After': '5'}
+            headers: { 'Retry-After': '5' }
           }))
           res.end('1')
         })
@@ -499,7 +499,7 @@ describe('finalhandler(req, res)', function () {
         error = e
       }
 
-      request(createServer(err, {onerror: log}))
+      request(createServer(err, { onerror: log }))
         .get('/')
         .end(function () {
           assert.equal(error, err)
