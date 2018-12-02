@@ -11,6 +11,7 @@ var createSlowWriteStream = utils.createSlowWriteStream
 var rawrequest = utils.rawrequest
 var request = utils.request
 var shouldHaveStatusMessage = utils.shouldHaveStatusMessage
+var shouldNotHaveBody = utils.shouldNotHaveBody
 var shouldNotHaveHeader = utils.shouldNotHaveHeader
 
 var describeStatusMessage = !/statusMessage/.test(http.IncomingMessage.toString())
@@ -264,7 +265,9 @@ describe('finalhandler(req, res)', function () {
     it('should handle HEAD', function (done) {
       request(createServer())
         .head('/foo')
-        .expect(404, '', done)
+        .expect(404)
+        .expect(shouldNotHaveBody())
+        .end(done)
     })
 
     it('should include X-Content-Type-Options header', function (done) {
@@ -302,7 +305,9 @@ describe('finalhandler(req, res)', function () {
     it('should handle HEAD', function (done) {
       request(createServer())
         .head('/foo')
-        .expect(404, '', done)
+        .expect(404)
+        .expect(shouldNotHaveBody())
+        .end(done)
     })
 
     it('should include X-Content-Type-Options header', function (done) {

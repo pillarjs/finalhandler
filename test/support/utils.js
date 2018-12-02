@@ -11,6 +11,7 @@ exports.createSlowWriteStream = createSlowWriteStream
 exports.rawrequest = rawrequest
 exports.request = request
 exports.shouldHaveStatusMessage = shouldHaveStatusMessage
+exports.shouldNotHaveBody = shouldNotHaveBody
 exports.shouldNotHaveHeader = shouldNotHaveHeader
 
 function createError (message, props) {
@@ -109,6 +110,12 @@ function rawrequest (server) {
 function shouldHaveStatusMessage (statusMessage) {
   return function (test) {
     assert.strictEqual(test.res.statusMessage, statusMessage, 'should have statusMessage "' + statusMessage + '"')
+  }
+}
+
+function shouldNotHaveBody () {
+  return function (res) {
+    assert.ok(res.text === '' || res.text === undefined)
   }
 }
 

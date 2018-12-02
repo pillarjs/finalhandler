@@ -26,7 +26,7 @@
     "mocha": "5.2.0",
     "readable-stream": "2.3.6",
     "safe-buffer": "5.1.2",
-    "supertest": "1.1.0"
+    "supertest": "3.3.0"
   },
   "files": [
     "LICENSE",
