@@ -1,3 +1,8 @@
+unreleased
+==========
+
+  * Set stricter `Content-Security-Policy` header
+
 1.1.1 / 2018-03-06
 ==================
 
