@@ -280,7 +280,7 @@ describe('finalhandler(req, res)', function () {
     it('should includeContent-Security-Policy header', function (done) {
       request(createServer())
         .get('/foo')
-        .expect('Content-Security-Policy', "default-src 'self'")
+        .expect('Content-Security-Policy', "default-src 'none'")
         .expect(404, done)
     })
 
@@ -320,7 +320,7 @@ describe('finalhandler(req, res)', function () {
     it('should includeContent-Security-Policy header', function (done) {
       request(createServer(createError('boom!')))
         .get('/foo')
-        .expect('Content-Security-Policy', "default-src 'self'")
+        .expect('Content-Security-Policy', "default-src 'none'")
         .expect(500, done)
     })
 

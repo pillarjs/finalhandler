@@ -1,6 +1,7 @@
 unreleased
 ==========
 
+  * Set stricter `Content-Security-Policy` header
   * deps: parseurl@~1.3.3
   * deps: statuses@~1.5.0
 
