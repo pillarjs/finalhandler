@@ -1,6 +1,7 @@
 unreleased
 ==========
 
+  * deps: parseurl@~1.3.3
   * deps: statuses@~1.5.0
 
 1.1.1 / 2018-03-06
