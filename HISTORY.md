@@ -1,5 +1,5 @@
-unreleased
-==========
+1.1.2 / 2019-05-09
+==================
 
   * Set stricter `Content-Security-Policy` header
   * deps: parseurl@~1.3.3
