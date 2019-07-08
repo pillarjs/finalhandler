@@ -277,10 +277,10 @@ describe('finalhandler(req, res)', function () {
         .expect(404, done)
     })
 
-    it('should includeContent-Security-Policy header', function (done) {
+    it('should include Content-Security-Policy header', function (done) {
       request(createServer())
         .get('/foo')
-        .expect('Content-Security-Policy', "default-src 'none'")
+        .expect('Content-Security-Policy', /^default-src 'none'; img-src 127\.0\.0\.1:\d+\/favicon\.ico$/)
         .expect(404, done)
     })
 
@@ -317,10 +317,10 @@ describe('finalhandler(req, res)', function () {
         .expect(500, done)
     })
 
-    it('should includeContent-Security-Policy header', function (done) {
+    it('should include Content-Security-Policy header', function (done) {
       request(createServer(createError('boom!')))
         .get('/foo')
-        .expect('Content-Security-Policy', "default-src 'none'")
+        .expect('Content-Security-Policy', /^default-src 'none'; img-src 127\.0\.0\.1:\d+\/favicon\.ico$/)
         .expect(500, done)
     })
 
