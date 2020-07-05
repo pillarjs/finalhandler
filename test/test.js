@@ -513,3 +513,33 @@ describe('finalhandler(req, res)', function () {
     })
   })
 })
+
+describe('HTTP2', function () {
+  it('should not set statusMessage for HTTP2 response', function (done) {
+    var http2
+    try {
+      http2 = require('http2')
+    } catch (e) {
+      return done()
+    }
+
+    process.once('warning', function (warning) {
+      assert.fail(warning)
+    })
+
+    var server = http2.createServer(function (req, res) {
+      var done = finalhandler(req, res)
+      done()
+    })
+
+    server.listen(function () {
+      var address = server.address()
+      var client = http2.connect('http://localhost:' + address.port)
+      client.request({ ':path': '/' }).on('response', function () {
+        client.close()
+        server.close()
+        done()
+      })
+    })
+  })
+})
