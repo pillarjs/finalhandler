@@ -3,7 +3,7 @@
 [![NPM Version][npm-image]][npm-url]
 [![NPM Downloads][downloads-image]][downloads-url]
 [![Node.js Version][node-image]][node-url]
-[![Build Status][travis-image]][travis-url]
+[![Build Status][github-actions-ci-image]][github-actions-ci-url]
 [![Test Coverage][coveralls-image]][coveralls-url]
 
 Node.js function to invoke as the final step to respond to HTTP request.
@@ -140,9 +140,9 @@ function logerror (err) {
 [npm-url]: https://npmjs.org/package/finalhandler
 [node-image]: https://img.shields.io/node/v/finalhandler.svg
 [node-url]: https://nodejs.org/en/download
-[travis-image]: https://img.shields.io/travis/pillarjs/finalhandler.svg
-[travis-url]: https://travis-ci.org/pillarjs/finalhandler
 [coveralls-image]: https://img.shields.io/coveralls/pillarjs/finalhandler.svg
 [coveralls-url]: https://coveralls.io/r/pillarjs/finalhandler?branch=master
 [downloads-image]: https://img.shields.io/npm/dm/finalhandler.svg
 [downloads-url]: https://npmjs.org/package/finalhandler
+[github-actions-ci-image]: https://img.shields.io/github/workflow/status/pillarjs/finalhandler/ci/master?label=ci
+[github-actions-ci-url]: https://github.com/jshttp/pillarjs/finalhandler?query=workflow%3Aci
