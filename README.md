@@ -31,7 +31,8 @@ var finalhandler = require('finalhandler')
 Returns function to be invoked as the final step for the given `req` and `res`.
 This function is to be invoked as `fn(err)`. If `err` is falsy, the handler will
 write out a 404 response to the `res`. If it is truthy, an error response will
-be written out to the `res`.
+be written out to the `res` or `res` will be terminated if a response has already
+started.
 
 When an error is written, the following information is added to the response:
 
