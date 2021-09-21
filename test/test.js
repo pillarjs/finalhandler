@@ -491,7 +491,22 @@ describe('finalhandler(req, res)', function () {
 
       request(server)
         .get('/foo')
-        .expect(301, '0', done)
+        .on('request', function onrequest (test) {
+          test.req.on('response', function onresponse (res) {
+            if (res.listeners('error').length > 0) {
+              // forward aborts as errors for supertest
+              res.on('aborted', function onabort () {
+                res.emit('error', new Error('aborted'))
+              })
+            }
+          })
+        })
+        .end(function (err) {
+          if (err && err.message !== 'aborted') return done(err)
+          assert.strictEqual(this.res.statusCode, 301)
+          assert.strictEqual(this.res.text, '0')
+          done()
+        })
     })
   })
 
