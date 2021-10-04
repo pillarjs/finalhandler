@@ -25,7 +25,7 @@
     "istanbul": "0.4.5",
     "mocha": "8.4.0",
     "readable-stream": "2.3.6",
-    "safe-buffer": "5.1.2",
+    "safe-buffer": "5.2.1",
     "supertest": "6.1.6"
   },
   "files": [
