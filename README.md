@@ -20,8 +20,6 @@ $ npm install finalhandler
 
 ## API
 
-<!-- eslint-disable no-unused-vars -->
-
 ```js
 var finalhandler = require('finalhandler')
 ```
