@@ -2,6 +2,7 @@ unreleased
 ==========
 
   * deps: on-finished@2.4.1
+  * deps: statuses@2.0.1
 
 1.1.2 / 2019-05-09
 ==================

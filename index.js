@@ -181,7 +181,7 @@ function getErrorMessage (err, status, env) {
     }
   }
 
-  return msg || statuses[status]
+  return msg || statuses.message[status]
 }
 
 /**
@@ -276,7 +276,7 @@ function send (req, res, status, headers, message) {
 
     // response status
     res.statusCode = status
-    res.statusMessage = statuses[status]
+    res.statusMessage = statuses.message[status]
 
     // response headers
     setHeaders(res, headers)
