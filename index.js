@@ -19,6 +19,13 @@ var parseUrl = require('parseurl')
 var statuses = require('statuses')
 var unpipe = require('unpipe')
 
+var http2
+try {
+  http2 = require('http2')
+} catch (e) {
+  http2 = null
+}
+
 /**
  * Module variables.
  * @private
@@ -276,7 +283,9 @@ function send (req, res, status, headers, message) {
 
     // response status
     res.statusCode = status
-    res.statusMessage = statuses[status]
+    if (!isHTTP2Response(res)) {
+      res.statusMessage = statuses[status]
+    }
 
     // response headers
     setHeaders(res, headers)
@@ -328,4 +337,15 @@ function setHeaders (res, headers) {
     var key = keys[i]
     res.setHeader(key, headers[key])
   }
+}
+
+/**
+ * Check if a response object is HTTP2.
+ *
+ * @param {OutgoingMessage|Http2ServerResponse} res
+ * @private
+ */
+
+function isHTTP2Response (res) {
+  return http2 && res instanceof http2.Http2ServerResponse
 }
