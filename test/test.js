@@ -303,9 +303,9 @@ describe('finalhandler(req, res)', function () {
     })
 
     it('should handle HEAD', function (done) {
-      request(createServer())
+      request(createServer(createError('boom!')))
         .head('/foo')
-        .expect(404)
+        .expect(500)
         .expect(shouldNotHaveBody())
         .end(done)
     })
