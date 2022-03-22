@@ -277,7 +277,7 @@ describe('finalhandler(req, res)', function () {
         .expect(404, done)
     })
 
-    it('should includeContent-Security-Policy header', function (done) {
+    it('should include Content-Security-Policy header', function (done) {
       request(createServer())
         .get('/foo')
         .expect('Content-Security-Policy', "default-src 'none'")
