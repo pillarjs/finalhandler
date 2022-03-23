@@ -278,6 +278,11 @@ function send (req, res, status, headers, message) {
     res.statusCode = status
     res.statusMessage = statuses.message[status]
 
+    // remove any content headers
+    res.removeHeader('Content-Encoding')
+    res.removeHeader('Content-Language')
+    res.removeHeader('Content-Range')
+
     // response headers
     setHeaders(res, headers)
 
