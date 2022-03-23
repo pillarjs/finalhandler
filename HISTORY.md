@@ -1,5 +1,5 @@
-unreleased
-==========
+1.2.0 / 2022-03-22
+==================
 
   * Remove set content headers that break response
   * deps: on-finished@2.4.1
