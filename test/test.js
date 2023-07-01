@@ -577,4 +577,45 @@ describe('finalhandler(req, res)', function () {
         })
     })
   })
+
+  describe('HTTP/2', function () {
+    it('should respond 404 without warning', function (done) {
+      var warned = false
+      process.on('warning', function (warning) {
+        if (warning.name !== 'UnsupportedWarning') return
+        if (!warning.message.match(/Status message is not supported/)) return
+        warned = true
+      })
+
+      var http2
+      try {
+        http2 = require('http2')
+      } catch (e) {
+        return done()
+      }
+
+      var server = http2.createServer(function (req, res) {
+        var done = finalhandler(req, res)
+        done()
+      })
+
+      server.listen(0, function () {
+        var port = server.address().port
+        var client = http2.connect('http://localhost:' + port)
+        var req = client.request({
+          ':method': 'GET',
+          ':path': '/foo'
+        })
+
+        req.on('response', function (headers) {
+          assert.strictEqual(headers[':status'], 404)
+          req.close()
+          client.close()
+          server.close()
+          assert.strictEqual(warned, false)
+          done()
+        })
+      })
+    })
+  })
 })
