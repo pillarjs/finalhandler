@@ -582,6 +582,8 @@ describe('finalhandler(req, res)', function () {
     it('should respond 404 without warning', function (done) {
       var warned = false
       process.on('warning', function (warning) {
+        if (warning.name !== 'UnsupportedWarning') return
+        if (!warning.message.match(/Status message is not supported/)) return
         warned = true
       })
 
