@@ -1,20 +1,19 @@
+const Buffer = require('safe-buffer').Buffer
+const finalhandler = require('..')
+const http = require('http')
+const utils = require('./support/utils')
 
-var Buffer = require('safe-buffer').Buffer
-var finalhandler = require('..')
-var http = require('http')
-var utils = require('./support/utils')
+const assert = utils.assert
+const createError = utils.createError
+const createServer = utils.createServer
+const createSlowWriteStream = utils.createSlowWriteStream
+const rawrequest = utils.rawrequest
+const request = utils.request
+const shouldHaveStatusMessage = utils.shouldHaveStatusMessage
+const shouldNotHaveBody = utils.shouldNotHaveBody
+const shouldNotHaveHeader = utils.shouldNotHaveHeader
 
-var assert = utils.assert
-var createError = utils.createError
-var createServer = utils.createServer
-var createSlowWriteStream = utils.createSlowWriteStream
-var rawrequest = utils.rawrequest
-var request = utils.request
-var shouldHaveStatusMessage = utils.shouldHaveStatusMessage
-var shouldNotHaveBody = utils.shouldNotHaveBody
-var shouldNotHaveHeader = utils.shouldNotHaveHeader
-
-var describeStatusMessage = !/statusMessage/.test(http.IncomingMessage.toString())
+const describeStatusMessage = !/statusMessage/.test(http.IncomingMessage.toString())
   ? describe.skip
   : describe
 
@@ -233,7 +232,7 @@ describe('finalhandler(req, res)', function () {
     })
 
     it('should fallback to generic pathname without URL', function (done) {
-      var server = createServer(function (req, res, next) {
+      const server = createServer(function (req, res, next) {
         req.url = undefined
         next()
       })
@@ -244,8 +243,8 @@ describe('finalhandler(req, res)', function () {
     })
 
     it('should include original pathname', function (done) {
-      var server = createServer(function (req, res, next) {
-        var parts = req.url.split('/')
+      const server = createServer(function (req, res, next) {
+        const parts = req.url.split('/')
         req.originalUrl = req.url
         req.url = '/' + parts.slice(2).join('/')
         next()
@@ -285,9 +284,9 @@ describe('finalhandler(req, res)', function () {
     })
 
     it('should not hang/error if there is a request body', function (done) {
-      var buf = Buffer.alloc(1024 * 16, '.')
-      var server = createServer()
-      var test = request(server).post('/foo')
+      const buf = Buffer.alloc(1024 * 16, '.')
+      const server = createServer()
+      const test = request(server).post('/foo')
       test.write(buf)
       test.write(buf)
       test.write(buf)
@@ -337,7 +336,7 @@ describe('finalhandler(req, res)', function () {
     })
 
     it('should send staus code name when production', function (done) {
-      var err = createError('boom!', {
+      const err = createError('boom!', {
         status: 501
       })
       request(createServer(err, {
@@ -349,9 +348,9 @@ describe('finalhandler(req, res)', function () {
 
     describe('when there is a request body', function () {
       it('should not hang/error when unread', function (done) {
-        var buf = Buffer.alloc(1024 * 16, '.')
-        var server = createServer(new Error('boom!'))
-        var test = request(server).post('/foo')
+        const buf = Buffer.alloc(1024 * 16, '.')
+        const server = createServer(new Error('boom!'))
+        const test = request(server).post('/foo')
         test.write(buf)
         test.write(buf)
         test.write(buf)
@@ -359,15 +358,15 @@ describe('finalhandler(req, res)', function () {
       })
 
       it('should not hang/error when actively piped', function (done) {
-        var buf = Buffer.alloc(1024 * 16, '.')
-        var server = createServer(function (req, res, next) {
+        const buf = Buffer.alloc(1024 * 16, '.')
+        const server = createServer(function (req, res, next) {
           req.pipe(stream)
           process.nextTick(function () {
             next(new Error('boom!'))
           })
         })
-        var stream = createSlowWriteStream()
-        var test = request(server).post('/foo')
+        const stream = createSlowWriteStream()
+        const test = request(server).post('/foo')
         test.write(buf)
         test.write(buf)
         test.write(buf)
@@ -375,15 +374,15 @@ describe('finalhandler(req, res)', function () {
       })
 
       it('should not hang/error when read', function (done) {
-        var buf = Buffer.alloc(1024 * 16, '.')
-        var server = createServer(function (req, res, next) {
+        const buf = Buffer.alloc(1024 * 16, '.')
+        const server = createServer(function (req, res, next) {
           // read off the request
           req.once('end', function () {
             next(new Error('boom!'))
           })
           req.resume()
         })
-        var test = request(server).post('/foo')
+        const test = request(server).post('/foo')
         test.write(buf)
         test.write(buf)
         test.write(buf)
@@ -393,8 +392,8 @@ describe('finalhandler(req, res)', function () {
 
     describe('when res.statusCode set', function () {
       it('should keep when >= 400', function (done) {
-        var server = http.createServer(function (req, res) {
-          var done = finalhandler(req, res)
+        const server = http.createServer(function (req, res) {
+          const done = finalhandler(req, res)
           res.statusCode = 503
           done(new Error('oops'))
         })
@@ -405,8 +404,8 @@ describe('finalhandler(req, res)', function () {
       })
 
       it('should convert to 500 is not a number', function (done) {
-        var server = http.createServer(function (req, res) {
-          var done = finalhandler(req, res)
+        const server = http.createServer(function (req, res) {
+          const done = finalhandler(req, res)
           res.statusCode = 'oh no'
           done(new Error('oops'))
         })
@@ -417,9 +416,9 @@ describe('finalhandler(req, res)', function () {
       })
 
       it('should override with err.status', function (done) {
-        var server = http.createServer(function (req, res) {
-          var done = finalhandler(req, res)
-          var err = createError('oops', {
+        const server = http.createServer(function (req, res) {
+          const done = finalhandler(req, res)
+          const err = createError('oops', {
             status: 414,
             statusCode: 503
           })
@@ -432,7 +431,7 @@ describe('finalhandler(req, res)', function () {
       })
 
       it('should default body to status message in production', function (done) {
-        var err = createError('boom!', {
+        const err = createError('boom!', {
           status: 509
         })
         request(createServer(err, {
@@ -445,8 +444,8 @@ describe('finalhandler(req, res)', function () {
 
     describe('when res.statusCode undefined', function () {
       it('should set to 500', function (done) {
-        var server = http.createServer(function (req, res) {
-          var done = finalhandler(req, res)
+        const server = http.createServer(function (req, res) {
+          const done = finalhandler(req, res)
           res.statusCode = undefined
           done(new Error('oops'))
         })
@@ -460,8 +459,8 @@ describe('finalhandler(req, res)', function () {
 
   describe('headers set', function () {
     it('should persist set headers', function (done) {
-      var server = http.createServer(function (req, res) {
-        var done = finalhandler(req, res)
+      const server = http.createServer(function (req, res) {
+        const done = finalhandler(req, res)
         res.setHeader('Server', 'foobar')
         done()
       })
@@ -474,8 +473,8 @@ describe('finalhandler(req, res)', function () {
     })
 
     it('should override content-type and length', function (done) {
-      var server = http.createServer(function (req, res) {
-        var done = finalhandler(req, res)
+      const server = http.createServer(function (req, res) {
+        const done = finalhandler(req, res)
         res.setHeader('Content-Type', 'image/png')
         res.setHeader('Content-Length', '50')
         done()
@@ -490,8 +489,8 @@ describe('finalhandler(req, res)', function () {
     })
 
     it('should remove other content headers', function (done) {
-      var server = http.createServer(function (req, res) {
-        var done = finalhandler(req, res)
+      const server = http.createServer(function (req, res) {
+        const done = finalhandler(req, res)
         res.setHeader('Content-Encoding', 'gzip')
         res.setHeader('Content-Language', 'jp')
         res.setHeader('Content-Range', 'bytes 0-2/10')
@@ -510,8 +509,8 @@ describe('finalhandler(req, res)', function () {
 
   describe('request started', function () {
     it('should not respond', function (done) {
-      var server = http.createServer(function (req, res) {
-        var done = finalhandler(req, res)
+      const server = http.createServer(function (req, res) {
+        const done = finalhandler(req, res)
         res.statusCode = 301
         res.write('0')
         process.nextTick(function () {
@@ -526,8 +525,8 @@ describe('finalhandler(req, res)', function () {
     })
 
     it('should terminate on error', function (done) {
-      var server = http.createServer(function (req, res) {
-        var done = finalhandler(req, res)
+      const server = http.createServer(function (req, res) {
+        const done = finalhandler(req, res)
         res.statusCode = 301
         res.write('0')
         process.nextTick(function () {
@@ -562,8 +561,8 @@ describe('finalhandler(req, res)', function () {
 
   describe('onerror', function () {
     it('should be invoked when error', function (done) {
-      var err = new Error('boom!')
-      var error
+      const err = new Error('boom!')
+      let error
 
       function log (e) {
         error = e

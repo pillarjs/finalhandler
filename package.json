@@ -6,7 +6,7 @@
   "license": "MIT",
   "repository": "pillarjs/finalhandler",
   "dependencies": {
-    "debug": "2.6.9",
+    "debug": "4.3.4",
     "encodeurl": "~1.0.2",
     "escape-html": "~1.0.3",
     "on-finished": "2.4.1",
@@ -15,18 +15,17 @@
     "unpipe": "~1.0.0"
   },
   "devDependencies": {
-    "eslint": "7.32.0",
-    "eslint-config-standard": "14.1.1",
-    "eslint-plugin-import": "2.26.0",
-    "eslint-plugin-markdown": "2.2.1",
+    "eslint": "8.51.0",
+    "eslint-config-standard": "17.1.0",
+    "eslint-plugin-import": "2.28.1",
+    "eslint-plugin-markdown": "3.0.1",
     "eslint-plugin-node": "11.1.0",
-    "eslint-plugin-promise": "5.2.0",
-    "eslint-plugin-standard": "4.1.0",
-    "mocha": "10.0.0",
+    "eslint-plugin-promise": "6.1.1",
+    "mocha": "10.2.0",
     "nyc": "15.1.0",
-    "readable-stream": "2.3.6",
+    "readable-stream": "4.4.2",
     "safe-buffer": "5.2.1",
-    "supertest": "6.2.4"
+    "supertest": "6.3.3"
   },
   "files": [
     "LICENSE",

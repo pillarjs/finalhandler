@@ -1,5 +1,5 @@
-var stream = require('readable-stream')
-var util = require('util')
+const stream = require('readable-stream')
+const util = require('util')
 
 module.exports = SlowWriteStream
 

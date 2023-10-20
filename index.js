@@ -11,27 +11,27 @@
  * @private
  */
 
-var debug = require('debug')('finalhandler')
-var encodeUrl = require('encodeurl')
-var escapeHtml = require('escape-html')
-var onFinished = require('on-finished')
-var parseUrl = require('parseurl')
-var statuses = require('statuses')
-var unpipe = require('unpipe')
+const debug = require('debug')('finalhandler')
+const encodeUrl = require('encodeurl')
+const escapeHtml = require('escape-html')
+const onFinished = require('on-finished')
+const parseUrl = require('parseurl')
+const statuses = require('statuses')
+const unpipe = require('unpipe')
 
 /**
  * Module variables.
  * @private
  */
 
-var DOUBLE_SPACE_REGEXP = /\x20{2}/g
-var NEWLINE_REGEXP = /\n/g
+const DOUBLE_SPACE_REGEXP = /\x20{2}/g
+const NEWLINE_REGEXP = /\n/g
 
 /* istanbul ignore next */
-var defer = typeof setImmediate === 'function'
+const defer = typeof setImmediate === 'function'
   ? setImmediate
-  : function (fn) { process.nextTick(fn.bind.apply(fn, arguments)) }
-var isFinished = onFinished.isFinished
+  : function (fn) { process.nextTick(fn.bind(...arguments)) }
+const isFinished = onFinished.isFinished
 
 /**
  * Create a minimal HTML document.
@@ -41,7 +41,7 @@ var isFinished = onFinished.isFinished
  */
 
 function createHtmlDocument (message) {
-  var body = escapeHtml(message)
+  const body = escapeHtml(message)
     .replace(NEWLINE_REGEXP, '<br>')
     .replace(DOUBLE_SPACE_REGEXP, ' &nbsp;')
 
@@ -75,18 +75,18 @@ module.exports = finalhandler
  */
 
 function finalhandler (req, res, options) {
-  var opts = options || {}
+  const opts = options || {}
 
   // get environment
-  var env = opts.env || process.env.NODE_ENV || 'development'
+  const env = opts.env || process.env.NODE_ENV || 'development'
 
   // get error callback
-  var onerror = opts.onerror
+  const onerror = opts.onerror
 
   return function (err) {
-    var headers
-    var msg
-    var status
+    let headers
+    let msg
+    let status
 
     // ignore 404 on in-flight response
     if (!err && headersSent(res)) {
@@ -147,11 +147,11 @@ function getErrorHeaders (err) {
     return undefined
   }
 
-  var headers = Object.create(null)
-  var keys = Object.keys(err.headers)
+  const headers = Object.create(null)
+  const keys = Object.keys(err.headers)
 
-  for (var i = 0; i < keys.length; i++) {
-    var key = keys[i]
+  for (const element of keys) {
+    const key = element
     headers[key] = err.headers[key]
   }
 
@@ -169,7 +169,7 @@ function getErrorHeaders (err) {
  */
 
 function getErrorMessage (err, status, env) {
-  var msg
+  let msg
 
   if (env !== 'production') {
     // use err.stack, which typically includes err.message
@@ -234,7 +234,7 @@ function getResourceName (req) {
  */
 
 function getResponseStatusCode (res) {
-  var status = res.statusCode
+  let status = res.statusCode
 
   // default status code to 500 if outside valid range
   if (typeof status !== 'number' || status < 400 || status > 599) {
@@ -272,7 +272,7 @@ function headersSent (res) {
 function send (req, res, status, headers, message) {
   function write () {
     // response body
-    var body = createHtmlDocument(message)
+    const body = createHtmlDocument(message)
 
     // response status
     res.statusCode = status
@@ -328,9 +328,9 @@ function setHeaders (res, headers) {
     return
   }
 
-  var keys = Object.keys(headers)
-  for (var i = 0; i < keys.length; i++) {
-    var key = keys[i]
+  const keys = Object.keys(headers)
+  for (const element of keys) {
+    const key = element
     res.setHeader(key, headers[key])
   }
 }

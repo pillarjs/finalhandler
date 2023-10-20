@@ -1,8 +1,8 @@
-var assert = require('assert')
-var finalhandler = require('../..')
-var http = require('http')
-var request = require('supertest')
-var SlowWriteStream = require('./sws')
+const assert = require('assert')
+const finalhandler = require('../..')
+const http = require('http')
+const request = require('supertest')
+const SlowWriteStream = require('./sws')
 
 exports.assert = assert
 exports.createError = createError
@@ -15,10 +15,10 @@ exports.shouldNotHaveBody = shouldNotHaveBody
 exports.shouldNotHaveHeader = shouldNotHaveHeader
 
 function createError (message, props) {
-  var err = new Error(message)
+  const err = new Error(message)
 
   if (props) {
-    for (var prop in props) {
+    for (const prop in props) {
       err[prop] = props[prop]
     }
   }
@@ -28,7 +28,7 @@ function createError (message, props) {
 
 function createServer (err, opts) {
   return http.createServer(function (req, res) {
-    var done = finalhandler(req, res, opts)
+    const done = finalhandler(req, res, opts)
 
     if (typeof err === 'function') {
       err(req, res, done)
@@ -44,8 +44,8 @@ function createSlowWriteStream () {
 }
 
 function rawrequest (server) {
-  var _headers = {}
-  var _path
+  const _headers = {}
+  let _path
 
   function expect (status, body, callback) {
     if (arguments.length === 2) {
@@ -54,25 +54,25 @@ function rawrequest (server) {
     }
 
     server.listen(function onlisten () {
-      var addr = this.address()
-      var port = addr.port
+      const addr = this.address()
+      const port = addr.port
 
-      var req = http.get({
+      const req = http.get({
         host: '127.0.0.1',
         path: _path,
-        port: port
+        port
       })
       req.on('error', callback)
       req.on('response', function onresponse (res) {
-        var buf = ''
+        let buf = ''
 
         res.setEncoding('utf8')
         res.on('data', function ondata (s) { buf += s })
         res.on('end', function onend () {
-          var err = null
+          let err = null
 
           try {
-            for (var key in _headers) {
+            for (const key in _headers) {
               assert.strictEqual(res.headers[key], _headers[key])
             }
 
@@ -98,12 +98,12 @@ function rawrequest (server) {
     _path = path
 
     return {
-      expect: expect
+      expect
     }
   }
 
   return {
-    get: get
+    get
   }
 }
 
