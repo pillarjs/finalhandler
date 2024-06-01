@@ -181,8 +181,10 @@ function getErrorMessage (err, status, env) {
     msg = err.stack
 
     // if error cause included
-    if (err.cause) {
-      msg += `\n[cause]: ${err.cause.stack}`
+    if (err && err.cause && err.cause.stack) {
+      msg += '\n[cause]: ' + err.cause.stack
+    } else if (err && err.stack) {
+      msg += '\n[stack]: ' + err.stack
     }
 
     // fallback to err.toString() when possible
