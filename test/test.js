@@ -650,6 +650,39 @@ var topDescribe = function (type, createServer) {
         })
     })
   })
+  describe('Errors with cause', function () {
+    it('should return Error message with 1 level cause trace', function (done) {
+      var err = new Error('foo', { cause: new Error('bar') })
+      var expectedRegex = [/Error: foo/, /\[cause\]: Error: bar/];
+
+      request(createServer(err))
+        .get('/')
+        .then((response) => {
+          for (var i = 0; i < expectedRegex.length; ++i) {
+            var regex = expectedRegex[i];
+            assert.match(response.text, regex);
+          }
+          done()
+        })
+        .catch(done)
+    })
+
+    it('should return Error message with 2 level cause trace', function (done) {
+      var err = new Error('foo', { cause: new Error('bar', { cause: new Error('baz') }) })
+      var expectedRegex = [/Error: foo/, /\[cause\]: Error: bar/, /\[cause\]: Error: baz/];
+
+      request(createServer(err))
+        .get('/')
+        .then((response) => {
+          for (var i = 0; i < expectedRegex.length; ++i) {
+            var regex = expectedRegex[i];
+            assert.match(response.text, regex);
+          }
+          done()
+        })
+        .catch(done)
+    })
+  })
 }
 
 var servers = [
