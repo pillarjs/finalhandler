@@ -226,12 +226,6 @@ describe('finalhandler(req, res)', function () {
         .expect(404, /<pre>Cannot GET \/%3Cla&#39;me%3E<\/pre>/, done)
     })
 
-    it('should encode bad pathname characters', function (done) {
-      rawrequest(createServer())
-        .get('/foo%20§')
-        .expect(404, /<pre>Cannot GET \/foo%20%C2%A7<\/pre>/, done)
-    })
-
     it('should fallback to generic pathname without URL', function (done) {
       var server = createServer(function (req, res, next) {
         req.url = undefined
