@@ -28,9 +28,12 @@ var DOUBLE_SPACE_REGEXP = /\x20{2}/g
 var NEWLINE_REGEXP = /\n/g
 
 /* istanbul ignore next */
-var defer = typeof setImmediate === 'function'
-  ? setImmediate
-  : function (fn) { process.nextTick(fn.bind.apply(fn, arguments)) }
+var defer =
+  typeof setImmediate === 'function'
+    ? setImmediate
+    : function (fn) {
+      process.nextTick(fn.bind.apply(fn, arguments))
+    }
 var isFinished = onFinished.isFinished
 
 /**
@@ -41,20 +44,22 @@ var isFinished = onFinished.isFinished
  */
 
 function createHtmlDocument (message) {
-  var body = escapeHtml(message)
-    .replace(NEWLINE_REGEXP, '<br>')
-    .replace(DOUBLE_SPACE_REGEXP, ' &nbsp;')
+  var body = escapeHtml(message).replace(NEWLINE_REGEXP, '<br>').replace(DOUBLE_SPACE_REGEXP, ' &nbsp;')
 
-  return '<!DOCTYPE html>\n' +
+  return (
+    '<!DOCTYPE html>\n' +
     '<html lang="en">\n' +
     '<head>\n' +
     '<meta charset="utf-8">\n' +
     '<title>Error</title>\n' +
     '</head>\n' +
     '<body>\n' +
-    '<pre>' + body + '</pre>\n' +
+    '<pre>' +
+    body +
+    '</pre>\n' +
     '</body>\n' +
     '</html>\n'
+  )
 }
 
 /**
@@ -175,6 +180,13 @@ function getErrorMessage (err, status, env) {
     // use err.stack, which typically includes err.message
     msg = err.stack
 
+    // if error cause included
+    if (err && err.cause && err.cause.stack) {
+      msg += '\n[cause]: ' + err.cause.stack
+    } else if (err && err.stack) {
+      msg += '\n[stack]: ' + err.stack
+    }
+
     // fallback to err.toString() when possible
     if (!msg && typeof err.toString === 'function') {
       msg = err.toString()
@@ -253,9 +265,7 @@ function getResponseStatusCode (res) {
  */
 
 function headersSent (res) {
-  return typeof res.headersSent !== 'boolean'
-    ? Boolean(res._header)
-    : res.headersSent
+  return typeof res.headersSent !== 'boolean' ? Boolean(res._header) : res.headersSent
 }
 
 /**
