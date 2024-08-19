@@ -28,7 +28,7 @@ for (var i = 0; i < servers.length; i++) {
   const name = servers[i][0]
   const createServer = servers[i][1]
 
-  describe(name, () => {
+  describe(name, function () {
     describe('headers', function () {
       it('should ignore err.headers without status code', function (done) {
         request(createServer(createError('oops!', {
