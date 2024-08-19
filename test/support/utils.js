@@ -6,7 +6,8 @@ var SlowWriteStream = require('./sws')
 
 exports.assert = assert
 exports.createError = createError
-exports.createServer = createServer
+exports.createHTTPServer = createHTTPServer
+exports.createHTTP2Server = createHTTP2Server
 exports.createSlowWriteStream = createSlowWriteStream
 exports.rawrequest = rawrequest
 exports.request = request
@@ -26,7 +27,20 @@ function createError (message, props) {
   return err
 }
 
-function createServer (err, opts) {
+function createHTTPServer (err, opts) {
+  return http.createServer(function (req, res) {
+    var done = finalhandler(req, res, opts)
+
+    if (typeof err === 'function') {
+      err(req, res, done)
+      return
+    }
+
+    done(err)
+  })
+}
+
+function createHTTP2Server (err, opts) {
   return http.createServer(function (req, res) {
     var done = finalhandler(req, res, opts)
 
