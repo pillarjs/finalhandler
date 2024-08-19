@@ -594,6 +594,7 @@ for (var i = 0; i < servers.length; i++) {
         var warned = false
 
         process.once('warning', function (warning) {
+          if (/The http2 module is an experimental API/.test(warning)) return
           assert.fail(warning)
         })
 
@@ -632,6 +633,7 @@ for (var i = 0; i < servers.length; i++) {
         var warned = false
 
         process.once('warning', function (warning) {
+          if (/The http2 module is an experimental API/.test(warning)) return
           assert.fail(warning)
         })
 
