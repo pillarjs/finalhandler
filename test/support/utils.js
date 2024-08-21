@@ -153,11 +153,11 @@ function rawrequestHTTP2 (server) {
         ':path': _path.replace(/http:\/\/localhost/, '')
       })
       req.on('error', callback)
-      req.on('response', (responseHeaders) => {
+      req.on('response', function onresponse (responseHeaders) {
         resHeaders = responseHeaders
       })
-      req.on('data', (s) => { buf += s })
-      req.on('end', () => {
+      req.on('data', function ondata (s) { buf += s })
+      req.on('end', function onend () {
         var err = null
 
         try {
