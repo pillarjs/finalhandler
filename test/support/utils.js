@@ -1,6 +1,15 @@
 var assert = require('assert')
 var finalhandler = require('../..')
 var http = require('http')
+
+var http2
+
+try {
+  http2 = require('http2')
+} catch (_err) {
+  // Nothing
+}
+
 var request = require('supertest')
 var SlowWriteStream = require('./sws')
 
@@ -10,6 +19,7 @@ exports.createHTTPServer = createHTTPServer
 exports.createHTTP2Server = createHTTP2Server
 exports.createSlowWriteStream = createSlowWriteStream
 exports.rawrequest = rawrequest
+exports.rawrequestHTTP2 = rawrequestHTTP2
 exports.request = request
 exports.shouldHaveStatusMessage = shouldHaveStatusMessage
 exports.shouldNotHaveBody = shouldNotHaveBody
@@ -41,7 +51,7 @@ function createHTTPServer (err, opts) {
 }
 
 function createHTTP2Server (err, opts) {
-  return http.createServer(function (req, res) {
+  return http2.createServer(function (req, res) {
     var done = finalhandler(req, res, opts)
 
     if (typeof err === 'function') {
@@ -104,6 +114,72 @@ function rawrequest (server) {
           server.close()
           callback(err)
         })
+      })
+    })
+  }
+
+  function get (path) {
+    _path = path
+
+    return {
+      expect: expect
+    }
+  }
+
+  return {
+    get: get
+  }
+}
+
+function rawrequestHTTP2 (server) {
+  var _headers = {}
+  var _path
+
+  function expect (status, body, callback) {
+    if (arguments.length === 2) {
+      _headers[status.toLowerCase()] = body
+      return this
+    }
+
+    server.listen(function onlisten () {
+      var buf = ''
+      var resHeaders
+      var addr = this.address()
+      var port = addr.port
+
+      var client = http2.connect('http://127.0.0.1:' + port)
+      var req = client.request({
+        ':method': 'GET',
+        ':path': _path.replace(/http:\/\/localhost/, '')
+      })
+      req.on('error', callback)
+      req.on('response', (responseHeaders) => {
+        resHeaders = responseHeaders
+      })
+      req.on('data', (s) => { buf += s })
+      req.on('end', () => {
+        var err = null
+
+        try {
+          for (var key in _headers) {
+            assert.strictEqual(resHeaders[key], _headers[key])
+          }
+
+          assert.strictEqual(resHeaders[':status'], status)
+
+          if (body instanceof RegExp) {
+            assert.ok(body.test(buf), 'expected body ' + buf + ' to match ' + body)
+          } else {
+            assert.strictEqual(buf, body, 'expected ' + body + ' response body, got ' + buf)
+          }
+        } catch (e) {
+          err = e
+        }
+
+        req.close()
+        client.close()
+        server.close()
+        callback(err)
       })
     })
   }

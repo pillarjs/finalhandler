@@ -2,6 +2,15 @@
 var Buffer = require('safe-buffer').Buffer
 var finalhandler = require('..')
 var http = require('http')
+
+var http2
+
+try {
+  http2 = require('http2')
+} catch (_err) {
+  // Nothing
+}
+
 var utils = require('./support/utils')
 
 var assert = utils.assert
@@ -10,172 +19,182 @@ var createHTTPServer = utils.createHTTPServer
 var createHTTP2Server = utils.createHTTP2Server
 var createSlowWriteStream = utils.createSlowWriteStream
 var rawrequest = utils.rawrequest
+var rawrequestHTTP2 = utils.rawrequestHTTP2
 var request = utils.request
 var shouldHaveStatusMessage = utils.shouldHaveStatusMessage
 var shouldNotHaveBody = utils.shouldNotHaveBody
 var shouldNotHaveHeader = utils.shouldNotHaveHeader
 
-var describeStatusMessage = !/statusMessage/.test(http.IncomingMessage.toString())
-  ? describe.skip
-  : describe
+var topDescribe = function (type, createServer) {
+  var wrapper = function wrapper (req) {
+    if (type === 'http2') {
+      return req.http2()
+    }
 
-var topDescribe = function (createServer) {
+    return req
+  }
+
   describe('headers', function () {
     it('should ignore err.headers without status code', function (done) {
-      request(createServer(createError('oops!', {
+      wrapper(request(createServer(createError('oops!', {
         headers: { 'X-Custom-Header': 'foo' }
       })))
-        .get('/')
+        .get('/'))
         .expect(shouldNotHaveHeader('X-Custom-Header'))
         .expect(500, done)
     })
 
     it('should ignore err.headers with invalid res.status', function (done) {
-      request(createServer(createError('oops!', {
+      wrapper(request(createServer(createError('oops!', {
         headers: { 'X-Custom-Header': 'foo' },
         status: 601
       })))
-        .get('/')
+        .get('/'))
         .expect(shouldNotHaveHeader('X-Custom-Header'))
         .expect(500, done)
     })
 
     it('should ignore err.headers with invalid res.statusCode', function (done) {
-      request(createServer(createError('oops!', {
+      wrapper(request(createServer(createError('oops!', {
         headers: { 'X-Custom-Header': 'foo' },
         statusCode: 601
       })))
-        .get('/')
+        .get('/'))
         .expect(shouldNotHaveHeader('X-Custom-Header'))
         .expect(500, done)
     })
 
     it('should include err.headers with err.status', function (done) {
-      request(createServer(createError('oops!', {
+      wrapper(request(createServer(createError('oops!', {
         headers: { 'X-Custom-Header': 'foo=500', 'X-Custom-Header2': 'bar' },
         status: 500
       })))
-        .get('/')
+        .get('/'))
         .expect('X-Custom-Header', 'foo=500')
         .expect('X-Custom-Header2', 'bar')
         .expect(500, done)
     })
 
     it('should include err.headers with err.statusCode', function (done) {
-      request(createServer(createError('too many requests', {
+      wrapper(request(createServer(createError('too many requests', {
         headers: { 'Retry-After': '5' },
         statusCode: 429
       })))
-        .get('/')
+        .get('/'))
         .expect('Retry-After', '5')
         .expect(429, done)
     })
 
     it('should ignore err.headers when not an object', function (done) {
-      request(createServer(createError('oops!', {
+      wrapper(request(createServer(createError('oops!', {
         headers: 'foobar',
         statusCode: 500
       })))
-        .get('/')
+        .get('/'))
         .expect(500, done)
     })
   })
 
   describe('status code', function () {
     it('should 404 on no error', function (done) {
-      request(createServer())
-        .get('/')
+      wrapper(request(createServer())
+        .get('/'))
         .expect(404, done)
     })
 
     it('should 500 on error', function (done) {
-      request(createServer(createError()))
-        .get('/')
+      wrapper(request(createServer(createError()))
+        .get('/'))
         .expect(500, done)
     })
 
     it('should use err.statusCode', function (done) {
-      request(createServer(createError('nope', {
+      wrapper(request(createServer(createError('nope', {
         statusCode: 400
       })))
-        .get('/')
+        .get('/'))
         .expect(400, done)
     })
 
     it('should ignore non-error err.statusCode code', function (done) {
-      request(createServer(createError('created', {
+      wrapper(request(createServer(createError('created', {
         statusCode: 201
       })))
-        .get('/')
+        .get('/'))
         .expect(500, done)
     })
 
     it('should ignore non-numeric err.statusCode', function (done) {
-      request(createServer(createError('oops', {
+      wrapper(request(createServer(createError('oops', {
         statusCode: 'oh no'
       })))
-        .get('/')
+        .get('/'))
         .expect(500, done)
     })
 
     it('should use err.status', function (done) {
-      request(createServer(createError('nope', {
+      wrapper(request(createServer(createError('nope', {
         status: 400
       })))
-        .get('/')
+        .get('/'))
         .expect(400, done)
     })
 
     it('should use err.status over err.statusCode', function (done) {
-      request(createServer(createError('nope', {
+      wrapper(request(createServer(createError('nope', {
         status: 400,
         statusCode: 401
       })))
-        .get('/')
+        .get('/'))
         .expect(400, done)
     })
 
     it('should set status to 500 when err.status < 400', function (done) {
-      request(createServer(createError('oops', {
+      wrapper(request(createServer(createError('oops', {
         status: 202
       })))
-        .get('/')
+        .get('/'))
         .expect(500, done)
     })
 
     it('should set status to 500 when err.status > 599', function (done) {
-      request(createServer(createError('oops', {
+      wrapper(request(createServer(createError('oops', {
         status: 601
       })))
-        .get('/')
+        .get('/'))
         .expect(500, done)
     })
 
     it('should use err.statusCode over invalid err.status', function (done) {
-      request(createServer(createError('nope', {
+      wrapper(request(createServer(createError('nope', {
         status: 50,
         statusCode: 410
       })))
-        .get('/')
+        .get('/'))
         .expect(410, done)
     })
 
     it('should ignore non-error err.status code', function (done) {
-      request(createServer(createError('created', {
+      wrapper(request(createServer(createError('created', {
         status: 201
       })))
-        .get('/')
+        .get('/'))
         .expect(500, done)
     })
 
     it('should ignore non-numeric err.status', function (done) {
-      request(createServer(createError('oops', {
+      wrapper(request(createServer(createError('oops', {
         status: 'oh no'
       })))
-        .get('/')
+        .get('/'))
         .expect(500, done)
     })
   })
+
+  // http2 does not support status message
+  var describeStatusMessage = !/statusMessage/.test(http.IncomingMessage.toString()) || type === 'http2'
+    ? describe.skip
+    : describe
 
   describeStatusMessage('status message', function () {
     it('should be "Not Found" on no error', function (done) {
@@ -216,13 +235,13 @@ var topDescribe = function (createServer) {
 
   describe('404 response', function () {
     it('should include method and pathname', function (done) {
-      request(createServer())
-        .get('/foo')
+      wrapper(request(createServer())
+        .get('/foo'))
         .expect(404, /<pre>Cannot GET \/foo<\/pre>/, done)
     })
 
     it('should escape method and pathname characters', function (done) {
-      rawrequest(createServer())
+      (type === 'http2' ? rawrequestHTTP2 : rawrequest)(createServer())
         .get('/<la\'me>')
         .expect(404, /<pre>Cannot GET \/%3Cla&#39;me%3E<\/pre>/, done)
     })
@@ -233,8 +252,8 @@ var topDescribe = function (createServer) {
         next()
       })
 
-      request(server)
-        .get('/foo')
+      wrapper(request(server)
+        .get('/foo'))
         .expect(404, /<pre>Cannot GET resource<\/pre>/, done)
     })
 
@@ -246,35 +265,35 @@ var topDescribe = function (createServer) {
         next()
       })
 
-      request(server)
-        .get('/foo/bar')
+      wrapper(request(server)
+        .get('/foo/bar'))
         .expect(404, /<pre>Cannot GET \/foo\/bar<\/pre>/, done)
     })
 
     it('should include pathname only', function (done) {
-      rawrequest(createServer())
+      (type === 'http2' ? rawrequestHTTP2 : rawrequest)(createServer())
         .get('http://localhost/foo?bar=1')
         .expect(404, /<pre>Cannot GET \/foo<\/pre>/, done)
     })
 
     it('should handle HEAD', function (done) {
-      request(createServer())
-        .head('/foo')
+      wrapper(request(createServer())
+        .head('/foo'))
         .expect(404)
         .expect(shouldNotHaveBody())
         .end(done)
     })
 
     it('should include X-Content-Type-Options header', function (done) {
-      request(createServer())
-        .get('/foo')
+      wrapper(request(createServer())
+        .get('/foo'))
         .expect('X-Content-Type-Options', 'nosniff')
         .expect(404, done)
     })
 
     it('should include Content-Security-Policy header', function (done) {
-      request(createServer())
-        .get('/foo')
+      wrapper(request(createServer())
+        .get('/foo'))
         .expect('Content-Security-Policy', "default-src 'none'")
         .expect(404, done)
     })
@@ -282,7 +301,7 @@ var topDescribe = function (createServer) {
     it('should not hang/error if there is a request body', function (done) {
       var buf = Buffer.alloc(1024 * 16, '.')
       var server = createServer()
-      var test = request(server).post('/foo')
+      var test = wrapper(request(server).post('/foo'))
       test.write(buf)
       test.write(buf)
       test.write(buf)
@@ -292,42 +311,42 @@ var topDescribe = function (createServer) {
 
   describe('error response', function () {
     it('should include error stack', function (done) {
-      request(createServer(createError('boom!')))
-        .get('/foo')
+      wrapper(request(createServer(createError('boom!')))
+        .get('/foo'))
         .expect(500, /<pre>Error: boom!<br> &nbsp; &nbsp;at/, done)
     })
 
     it('should handle HEAD', function (done) {
-      request(createServer(createError('boom!')))
-        .head('/foo')
+      wrapper(request(createServer(createError('boom!')))
+        .head('/foo'))
         .expect(500)
         .expect(shouldNotHaveBody())
         .end(done)
     })
 
     it('should include X-Content-Type-Options header', function (done) {
-      request(createServer(createError('boom!')))
-        .get('/foo')
+      wrapper(request(createServer(createError('boom!')))
+        .get('/foo'))
         .expect('X-Content-Type-Options', 'nosniff')
         .expect(500, done)
     })
 
     it('should includeContent-Security-Policy header', function (done) {
-      request(createServer(createError('boom!')))
-        .get('/foo')
+      wrapper(request(createServer(createError('boom!')))
+        .get('/foo'))
         .expect('Content-Security-Policy', "default-src 'none'")
         .expect(500, done)
     })
 
     it('should handle non-error-objects', function (done) {
-      request(createServer('lame string'))
-        .get('/foo')
+      wrapper(request(createServer('lame string'))
+        .get('/foo'))
         .expect(500, /<pre>lame string<\/pre>/, done)
     })
 
     it('should handle null prototype objects', function (done) {
-      request(createServer(Object.create(null)))
-        .get('/foo')
+      wrapper(request(createServer(Object.create(null)))
+        .get('/foo'))
         .expect(500, /<pre>Internal Server Error<\/pre>/, done)
     })
 
@@ -335,10 +354,10 @@ var topDescribe = function (createServer) {
       var err = createError('boom!', {
         status: 501
       })
-      request(createServer(err, {
+      wrapper(request(createServer(err, {
         env: 'production'
       }))
-        .get('/foo')
+        .get('/foo'))
         .expect(501, /<pre>Not Implemented<\/pre>/, done)
     })
 
@@ -346,7 +365,7 @@ var topDescribe = function (createServer) {
       it('should not hang/error when unread', function (done) {
         var buf = Buffer.alloc(1024 * 16, '.')
         var server = createServer(new Error('boom!'))
-        var test = request(server).post('/foo')
+        var test = wrapper(request(server).post('/foo'))
         test.write(buf)
         test.write(buf)
         test.write(buf)
@@ -362,7 +381,7 @@ var topDescribe = function (createServer) {
           })
         })
         var stream = createSlowWriteStream()
-        var test = request(server).post('/foo')
+        var test = wrapper(request(server).post('/foo'))
         test.write(buf)
         test.write(buf)
         test.write(buf)
@@ -378,7 +397,7 @@ var topDescribe = function (createServer) {
           })
           req.resume()
         })
-        var test = request(server).post('/foo')
+        var test = wrapper(request(server).post('/foo'))
         test.write(buf)
         test.write(buf)
         test.write(buf)
@@ -394,20 +413,26 @@ var topDescribe = function (createServer) {
           done(new Error('oops'))
         })
 
-        request(server)
-          .get('/foo')
+        wrapper(request(server)
+          .get('/foo'))
           .expect(503, done)
       })
 
       it('should convert to 500 is not a number', function (done) {
+        // http2 does not support non numeric status code
+        if (type === 'http2') {
+          done()
+          return
+        }
+
         var server = createServer(function (req, res) {
           var done = finalhandler(req, res)
           res.statusCode = 'oh no'
           done(new Error('oops'))
         })
 
-        request(server)
-          .get('/foo')
+        wrapper(request(server)
+          .get('/foo'))
           .expect(500, done)
       })
 
@@ -421,8 +446,8 @@ var topDescribe = function (createServer) {
           done(err)
         })
 
-        request(server)
-          .get('/foo')
+        wrapper(request(server)
+          .get('/foo'))
           .expect(414, done)
       })
 
@@ -430,24 +455,30 @@ var topDescribe = function (createServer) {
         var err = createError('boom!', {
           status: 509
         })
-        request(createServer(err, {
+        wrapper(request(createServer(err, {
           env: 'production'
         }))
-          .get('/foo')
+          .get('/foo'))
           .expect(509, /<pre>Bandwidth Limit Exceeded<\/pre>/, done)
       })
     })
 
     describe('when res.statusCode undefined', function () {
       it('should set to 500', function (done) {
+        // http2 does not support non numeric status code
+        if (type === 'http2') {
+          done()
+          return
+        }
+
         var server = createServer(function (req, res) {
           var done = finalhandler(req, res)
           res.statusCode = undefined
           done(new Error('oops'))
         })
 
-        request(server)
-          .get('/foo')
+        wrapper(request(server)
+          .get('/foo'))
           .expect(500, done)
       })
     })
@@ -461,8 +492,8 @@ var topDescribe = function (createServer) {
         done()
       })
 
-      request(server)
-        .get('/foo')
+      wrapper(request(server)
+        .get('/foo'))
         .expect(404)
         .expect('Server', 'foobar')
         .end(done)
@@ -476,8 +507,8 @@ var topDescribe = function (createServer) {
         done()
       })
 
-      request(server)
-        .get('/foo')
+      wrapper(request(server)
+        .get('/foo'))
         .expect(404)
         .expect('Content-Type', 'text/html; charset=utf-8')
         .expect('Content-Length', '142')
@@ -493,8 +524,8 @@ var topDescribe = function (createServer) {
         done()
       })
 
-      request(server)
-        .get('/foo')
+      wrapper(request(server)
+        .get('/foo'))
         .expect(404)
         .expect(shouldNotHaveHeader('Content-Encoding'))
         .expect(shouldNotHaveHeader('Content-Language'))
@@ -515,8 +546,8 @@ var topDescribe = function (createServer) {
         })
       })
 
-      request(server)
-        .get('/foo')
+      wrapper(request(server)
+        .get('/foo'))
         .expect(301, '01', done)
     })
 
@@ -534,8 +565,8 @@ var topDescribe = function (createServer) {
         })
       })
 
-      request(server)
-        .get('/foo')
+      wrapper(request(server)
+        .get('/foo'))
         .on('request', function onrequest (test) {
           test.req.on('response', function onresponse (res) {
             if (res.listeners('error').length > 0) {
@@ -564,8 +595,8 @@ var topDescribe = function (createServer) {
         error = e
       }
 
-      request(createServer(err, { onerror: log }))
-        .get('/')
+      wrapper(request(createServer(err, { onerror: log }))
+        .get('/'))
         .end(function () {
           assert.equal(error, err)
           done()
@@ -575,13 +606,6 @@ var topDescribe = function (createServer) {
 
   describe('no deprecation warnings', function () {
     it('should respond 404 on no error', function (done) {
-      var http2
-      try {
-        http2 = require('http2')
-      } catch (e) {
-        return done()
-      }
-
       var warned = false
 
       process.once('warning', function (warning) {
@@ -589,38 +613,16 @@ var topDescribe = function (createServer) {
         assert.fail(warning)
       })
 
-      var server = http2.createServer(function (req, res) {
-        var done = finalhandler(req, res)
-        done()
-      })
-
-      server.listen(function () {
-        var port = server.address().port
-        var client = http2.connect('http://localhost:' + port)
-        var req = client.request({
-          ':method': 'GET',
-          ':path': '/foo'
-        })
-
-        req.on('response', function (headers) {
-          assert.strictEqual(headers[':status'], 404)
-          req.close()
-          client.close()
-          server.close()
+      wrapper(request(createServer())
+        .head('/foo'))
+        .expect(404)
+        .end(function (err) {
           assert.strictEqual(warned, false)
-          done()
+          done(err)
         })
-      })
     })
 
     it('should respond 500 on error', function (done) {
-      var http2
-      try {
-        http2 = require('http2')
-      } catch (e) {
-        return done()
-      }
-
       var warned = false
 
       process.once('warning', function (warning) {
@@ -630,7 +632,7 @@ var topDescribe = function (createServer) {
 
       var err = createError()
 
-      var server = http2.createServer(function (req, res) {
+      wrapper(request(createServer(function (req, res) {
         var done = finalhandler(req, res)
 
         if (typeof err === 'function') {
@@ -639,36 +641,30 @@ var topDescribe = function (createServer) {
         }
 
         done(err)
-      })
-
-      server.listen(function () {
-        var port = server.address().port
-        var client = http2.connect('http://localhost:' + port)
-        var req = client.request({
-          ':method': 'GET',
-          ':path': '/foo'
-        })
-
-        req.on('response', function (headers) {
-          assert.strictEqual(headers[':status'], 500)
-          req.close()
-          client.close()
-          server.close()
+      }))
+        .head('/foo'))
+        .expect(500)
+        .end(function (err, res) {
           assert.strictEqual(warned, false)
-          done()
+          done(err)
         })
-      })
     })
   })
 }
 
 var servers = [
-  ['http', createHTTPServer],
-  ['http2', createHTTP2Server]
+  ['http', createHTTPServer]
 ]
 
+var nodeVersion = process.versions.node.split('.').map(Number)
+
+// `superagent` only supports `http2` since Node.js@10
+if (http2 && nodeVersion[0] >= 10) {
+  servers.push(['http2', createHTTP2Server])
+}
+
 for (var i = 0; i < servers.length; i++) {
-  var tests = topDescribe.bind(undefined, servers[i][1])
+  var tests = topDescribe.bind(undefined, servers[i][0], servers[i][1])
 
   describe(servers[i][0], tests)
 }
