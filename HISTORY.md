@@ -1,7 +1,8 @@
 unreleased
 ==================
 
-  * dorp support for node <18
+  * drop support for node <18
+  * ignore status message for HTTP/2 (#53) 
 
 1.2.0 / 2022-03-22
 ==================
