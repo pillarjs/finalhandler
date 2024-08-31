@@ -11,6 +11,7 @@
  * @private
  */
 
+var util = require('util')
 var debug = require('debug')('finalhandler')
 var encodeUrl = require('encodeurl')
 var escapeHtml = require('escape-html')
@@ -172,8 +173,8 @@ function getErrorMessage (err, status, env) {
   var msg
 
   if (env !== 'production') {
-    // use err.stack, which typically includes err.message
-    msg = err.stack
+    // use util.format to get native Error print
+    msg = util.format(err)
 
     // fallback to err.toString() when possible
     if (!msg && typeof err.toString === 'function') {
