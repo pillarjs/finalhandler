@@ -276,7 +276,10 @@ function send (req, res, status, headers, message) {
 
     // response status
     res.statusCode = status
-    res.statusMessage = statuses.message[status]
+
+    if (req.httpVersionMajor < 2) {
+      res.statusMessage = statuses.message[status]
+    }
 
     // remove any content headers
     res.removeHeader('Content-Encoding')
