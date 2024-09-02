@@ -1,4 +1,4 @@
-unreleased
+v1.2.1 / 2024-09-02
 ==================
 
   * Gracefully handle when handling an error and socket is null
