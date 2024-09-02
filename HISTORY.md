@@ -1,3 +1,8 @@
+unreleased
+==================
+
+  * Gracefully handle when handling an error and socket is null
+
 1.2.0 / 2022-03-22
 ==================
 

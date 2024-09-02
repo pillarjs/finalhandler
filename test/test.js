@@ -571,4 +571,25 @@ describe('finalhandler(req, res)', function () {
         })
     })
   })
+
+  if (parseInt(process.version.split('.')[0].replace(/^v/, ''), 10) > 11) {
+    describe('req.socket', function () {
+      it('should not throw when socket is null', function (done) {
+        request(createServer(function (req, res, next) {
+          res.statusCode = 200
+          res.end('ok')
+          process.nextTick(function () {
+            req.socket = null
+            next(new Error())
+          })
+        }))
+          .get('/')
+          .end(function () {
+            assert.strictEqual(this.res.statusCode, 200)
+            assert.strictEqual(this.res.text, 'ok')
+            done()
+          })
+      })
+    })
+  }
 })
