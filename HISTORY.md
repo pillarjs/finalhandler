@@ -1,4 +1,4 @@
-unreleased
+v2.0.0 / 2024-09-02
 ==================
 
   * drop support for node <18
