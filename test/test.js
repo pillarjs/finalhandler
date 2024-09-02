@@ -607,7 +607,7 @@ var topDescribe = function (type, createServer) {
   if (parseInt(process.version.split('.')[0].replace(/^v/, ''), 10) > 11) {
     describe('req.socket', function () {
       it('should not throw when socket is null', function (done) {
-        request(createServer(function (req, res, next) {
+        wrapper(request(createServer(function (req, res, next) {
           res.statusCode = 200
           res.end('ok')
           process.nextTick(function () {
@@ -615,11 +615,10 @@ var topDescribe = function (type, createServer) {
             next(new Error())
           })
         }))
-          .get('/')
-          .end(function () {
-            assert.strictEqual(this.res.statusCode, 200)
-            assert.strictEqual(this.res.text, 'ok')
-            done()
+          .get('/'))
+          .expect(200)
+          .end(function (err) {
+            done(err)
           })
       })
     })
