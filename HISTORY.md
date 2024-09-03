@@ -1,4 +1,4 @@
-unreleased
+v1.3.0 / 2024-09-03
 ==================
 
   * ignore status message for HTTP/2 (#53)
