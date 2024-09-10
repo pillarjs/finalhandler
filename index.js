@@ -12,7 +12,6 @@
  */
 
 var debug = require('debug')('finalhandler')
-var encodeUrl = require('encodeurl')
 var escapeHtml = require('escape-html')
 var onFinished = require('on-finished')
 var parseUrl = require('parseurl')
@@ -112,7 +111,7 @@ function finalhandler (req, res, options) {
     } else {
       // not found
       status = 404
-      msg = 'Cannot ' + req.method + ' ' + encodeUrl(getResourceName(req))
+      msg = 'Cannot ' + req.method + ' ' + getResourceName(req)
     }
 
     debug('default %s', status)

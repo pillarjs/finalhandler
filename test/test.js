@@ -243,7 +243,7 @@ var topDescribe = function (type, createServer) {
     it('should escape method and pathname characters', function (done) {
       (type === 'http2' ? rawrequestHTTP2 : rawrequest)(createServer())
         .get('/<la\'me>')
-        .expect(404, /<pre>Cannot GET \/%3Cla&#39;me%3E<\/pre>/, done)
+        .expect(404, /<pre>Cannot GET \/&lt;la&#39;me&gt;<\/pre>/, done)
     })
 
     it('should fallback to generic pathname without URL', function (done) {
