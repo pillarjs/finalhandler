@@ -1,5 +1,3 @@
-
-var Buffer = require('safe-buffer').Buffer
 var finalhandler = require('..')
 var http = require('http')
 
