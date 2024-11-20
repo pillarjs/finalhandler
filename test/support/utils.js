@@ -1,14 +1,7 @@
 var assert = require('assert')
 var finalhandler = require('../..')
 var http = require('http')
-
-var http2
-
-try {
-  http2 = require('http2')
-} catch (_err) {
-  // Nothing
-}
+var http2 = require('http2')
 
 var request = require('supertest')
 var SlowWriteStream = require('./sws')
