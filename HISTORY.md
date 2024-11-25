@@ -2,6 +2,7 @@ unreleased
 ==================
 
   * remove `ServerResponse.headersSent` support check
+  * remove setImmediate support check
   * remove unnecessary devDependency `safe-buffer`
   * remove `unpipe` package and use native `unpipe()` method
   * remove unnecessary devDependency `readable-stream`
