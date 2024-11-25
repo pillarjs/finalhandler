@@ -17,7 +17,6 @@ var escapeHtml = require('escape-html')
 var onFinished = require('on-finished')
 var parseUrl = require('parseurl')
 var statuses = require('statuses')
-var unpipe = require('unpipe')
 
 /**
  * Module variables.
@@ -313,7 +312,7 @@ function send (req, res, status, headers, message) {
   }
 
   // unpipe everything from the request
-  unpipe(req)
+  req.unpipe()
 
   // flush the request
   onFinished(req, write)
