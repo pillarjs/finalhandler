@@ -1,4 +1,4 @@
-var stream = require('readable-stream')
+var stream = require('stream')
 var util = require('util')
 
 module.exports = SlowWriteStream
