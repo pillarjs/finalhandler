@@ -14,6 +14,16 @@ v2.0.0 / 2024-09-02
   * drop support for node <18
   * ignore status message for HTTP/2 (#53) 
 
+v1.3.1 / 2024-09-11
+==================
+
+  * deps: encodeurl@~2.0.0
+
+v1.3.0 / 2024-09-03
+==================
+
+  * ignore status message for HTTP/2 (#53)
+
 v1.2.1 / 2024-09-02
 ==================
 
