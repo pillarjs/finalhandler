@@ -1,14 +1,6 @@
 var finalhandler = require('..')
 var http = require('http')
 
-var http2
-
-try {
-  http2 = require('http2')
-} catch (_err) {
-  // Nothing
-}
-
 var utils = require('./support/utils')
 
 var assert = utils.assert
@@ -671,15 +663,9 @@ var topDescribe = function (type, createServer) {
 }
 
 var servers = [
-  ['http', createHTTPServer]
+  ['http', createHTTPServer],
+  ['http2', createHTTP2Server]
 ]
-
-var nodeVersion = process.versions.node.split('.').map(Number)
-
-// `superagent` only supports `http2` since Node.js@10
-if (http2 && nodeVersion[0] >= 10) {
-  servers.push(['http2', createHTTP2Server])
-}
 
 for (var i = 0; i < servers.length; i++) {
   var tests = topDescribe.bind(undefined, servers[i][0], servers[i][1])
