@@ -26,10 +26,6 @@ var statuses = require('statuses')
 var DOUBLE_SPACE_REGEXP = /\x20{2}/g
 var NEWLINE_REGEXP = /\n/g
 
-/* istanbul ignore next */
-var defer = typeof setImmediate === 'function'
-  ? setImmediate
-  : function (fn) { process.nextTick(fn.bind.apply(fn, arguments)) }
 var isFinished = onFinished.isFinished
 
 /**
@@ -118,7 +114,7 @@ function finalhandler (req, res, options) {
 
     // schedule onerror callback
     if (err && onerror) {
-      defer(onerror, err, req, res)
+      setImmediate(onerror, err, req, res)
     }
 
     // cannot actually respond
