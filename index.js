@@ -259,7 +259,9 @@ function send (req, res, status, headers, message) {
     res.removeHeader('Content-Range')
 
     // response headers
-    setHeaders(res, headers)
+    for (const [key, value] of Object.entries(headers ?? {})) {
+      res.setHeader(key, value)
+    }
 
     // security headers
     res.setHeader('Content-Security-Policy', "default-src 'none'")
@@ -288,24 +290,4 @@ function send (req, res, status, headers, message) {
   // flush the request
   onFinished(req, write)
   req.resume()
-}
-
-/**
- * Set response headers from an object.
- *
- * @param {OutgoingMessage} res
- * @param {object} headers
- * @private
- */
-
-function setHeaders (res, headers) {
-  if (!headers) {
-    return
-  }
-
-  var keys = Object.keys(headers)
-  for (var i = 0; i < keys.length; i++) {
-    var key = keys[i]
-    res.setHeader(key, headers[key])
-  }
 }
