@@ -2,6 +2,7 @@ unreleased
 ==================
 
   * remove unnecessary devDependency `safe-buffer`
+  * remove `unpipe` package and use native `unpipe()` method
   * remove unnecessary devDependency `readable-stream`
 
 v2.0.0 / 2024-09-02
