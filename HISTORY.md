@@ -1,6 +1,7 @@
 unreleased
 ==================
 
+  * refactor: replace setHeaders function with optimized inline header setting
   * remove unnecessary devDependency `safe-buffer`
   * remove `unpipe` package and use native `unpipe()` method
   * remove unnecessary devDependency `readable-stream`
