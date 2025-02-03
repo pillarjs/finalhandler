@@ -6,7 +6,7 @@
   "license": "MIT",
   "repository": "pillarjs/finalhandler",
   "dependencies": {
-    "debug": "2.6.9",
+    "debug": "^4.4.0",
     "encodeurl": "^2.0.0",
     "escape-html": "~1.0.3",
     "on-finished": "2.4.1",
