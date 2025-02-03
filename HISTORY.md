@@ -1,7 +1,9 @@
 unreleased
 ==================
 
-  * deps: encodeurl@^2.0.0
+  * deps: 
+    * encodeurl@^2.0.0
+    * debug@^4.4.0
   * remove `ServerResponse.headersSent` support check
   * remove setImmediate support check
   * update test dependencies
