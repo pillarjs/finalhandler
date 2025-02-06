@@ -144,15 +144,7 @@ function getErrorHeaders (err) {
     return undefined
   }
 
-  var headers = Object.create(null)
-  var keys = Object.keys(err.headers)
-
-  for (var i = 0; i < keys.length; i++) {
-    var key = keys[i]
-    headers[key] = err.headers[key]
-  }
-
-  return headers
+  return { ...err.headers }
 }
 
 /**
