@@ -11,6 +11,7 @@ unreleased
   * remove `unpipe` package and use native `unpipe()` method
   * remove unnecessary devDependency `readable-stream`
   * refactor: use object spread to copy error headers
+  * refactor: use replaceAll instead of replace with a regex
 
 v2.0.0 / 2024-09-02
 ==================

@@ -23,9 +23,6 @@ var statuses = require('statuses')
  * @private
  */
 
-var DOUBLE_SPACE_REGEXP = /\x20{2}/g
-var NEWLINE_REGEXP = /\n/g
-
 var isFinished = onFinished.isFinished
 
 /**
@@ -37,8 +34,8 @@ var isFinished = onFinished.isFinished
 
 function createHtmlDocument (message) {
   var body = escapeHtml(message)
-    .replace(NEWLINE_REGEXP, '<br>')
-    .replace(DOUBLE_SPACE_REGEXP, ' &nbsp;')
+    .replaceAll('\n', '<br>')
+    .replaceAll('  ', ' &nbsp;')
 
   return '<!DOCTYPE html>\n' +
     '<html lang="en">\n' +
