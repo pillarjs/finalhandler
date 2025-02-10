@@ -1,7 +1,8 @@
-unreleased
+v2.1.0 / 2025-03-05
 ==================
 
   * deps: 
+    * use caret notation for dependency versions
     * encodeurl@^2.0.0
     * debug@^4.4.0
   * remove `ServerResponse.headersSent` support check
