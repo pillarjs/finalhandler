@@ -28,7 +28,6 @@
   "files": [
     "LICENSE",
     "HISTORY.md",
-    "SECURITY.md",
     "index.js"
   ],
   "engines": {
