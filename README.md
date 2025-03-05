@@ -5,6 +5,7 @@
 [![Node.js Version][node-image]][node-url]
 [![Build Status][github-actions-ci-image]][github-actions-ci-url]
 [![Test Coverage][coveralls-image]][coveralls-url]
+[![OpenSSF Scorecard Badge][ossf-scorecard-badge]][ossf-scorecard-visualizer]
 
 Node.js function to invoke as the final step to respond to HTTP request.
 
@@ -145,3 +146,5 @@ function logerror (err) {
 [downloads-url]: https://npmjs.org/package/finalhandler
 [github-actions-ci-image]: https://github.com/pillarjs/finalhandler/actions/workflows/ci.yml/badge.svg
 [github-actions-ci-url]: https://github.com/pillarjs/finalhandler/actions/workflows/ci.yml
+[ossf-scorecard-badge]: https://api.scorecard.dev/projects/github.com/pillarjs/finalhandler/badge
+[ossf-scorecard-visualizer]: https://ossf.github.io/scorecard-visualizer/#/projects/github.com/pillarjs/finalhandler
