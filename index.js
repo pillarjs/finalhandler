@@ -11,7 +11,7 @@
  * @private
  */
 
-var accepts = require('accepts')
+var Negotiator = require('negotiator')
 var debug = require('debug')('finalhandler')
 var encodeUrl = require('encodeurl')
 var escapeHtml = require('escape-html')
@@ -145,12 +145,12 @@ function finalhandler (req, res, options) {
     }
 
     // negotiate
-    var accept = accepts(req)
-    var type = accept.types('html')
+    var negotiator = new Negotiator(req)
+    var type = negotiator.mediaType(['text/html'])
 
     // construct body
     switch (type) {
-      case 'html':
+      case 'text/html':
         body = createHtmlBody(msg)
         break
       default:
