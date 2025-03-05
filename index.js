@@ -11,6 +11,7 @@
  * @private
  */
 
+var accepts = require('accepts')
 var debug = require('debug')('finalhandler')
 var encodeUrl = require('encodeurl')
 var escapeHtml = require('escape-html')
@@ -32,21 +33,40 @@ var isFinished = onFinished.isFinished
  * @private
  */
 
-function createHtmlDocument (message) {
-  var body = escapeHtml(message)
+function createHtmlBody (message) {
+  var msg = escapeHtml(message)
     .replaceAll('\n', '<br>')
     .replaceAll('  ', ' &nbsp;')
 
-  return '<!DOCTYPE html>\n' +
+  var html = '<!DOCTYPE html>\n' +
     '<html lang="en">\n' +
     '<head>\n' +
     '<meta charset="utf-8">\n' +
     '<title>Error</title>\n' +
     '</head>\n' +
     '<body>\n' +
-    '<pre>' + body + '</pre>\n' +
+    '<pre>' + msg + '</pre>\n' +
     '</body>\n' +
     '</html>\n'
+
+  var body = Buffer.from(html, 'utf8')
+  body.type = 'text/html; charset=utf-8'
+  return body
+}
+
+/**
+ * Get plain text body string
+ *
+ * @param {number} status
+ * @param {string} message
+ * @return {Buffer}
+ * @private
+ */
+
+function createTextBody (message) {
+  var body = Buffer.from(message + '\n', 'utf8')
+  body.type = 'text/plain; charset=utf-8'
+  return body
 }
 
 /**
@@ -79,6 +99,7 @@ function finalhandler (req, res, options) {
     var headers
     var msg
     var status
+    var body
 
     // ignore 404 on in-flight response
     if (!err && res.headersSent) {
@@ -123,8 +144,23 @@ function finalhandler (req, res, options) {
       return
     }
 
+    // negotiate
+    var accept = accepts(req)
+    var type = accept.types('html')
+
+    // construct body
+    switch (type) {
+      case 'html':
+        body = createHtmlBody(msg)
+        break
+      default:
+        // default to plain text
+        body = createTextBody(msg)
+        break
+    }
+
     // send response
-    send(req, res, status, headers, msg)
+    send(req, res, status, headers, body)
   }
 }
 
@@ -241,11 +277,8 @@ function getResponseStatusCode (res) {
  * @private
  */
 
-function send (req, res, status, headers, message) {
+function send (req, res, status, headers, body) {
   function write () {
-    // response body
-    var body = createHtmlDocument(message)
-
     // response status
     res.statusCode = status
 
@@ -268,8 +301,8 @@ function send (req, res, status, headers, message) {
     res.setHeader('X-Content-Type-Options', 'nosniff')
 
     // standard headers
-    res.setHeader('Content-Type', 'text/html; charset=utf-8')
-    res.setHeader('Content-Length', Buffer.byteLength(body, 'utf8'))
+    res.setHeader('Content-Type', body.type)
+    res.setHeader('Content-Length', body.length)
 
     if (req.method === 'HEAD') {
       res.end()
