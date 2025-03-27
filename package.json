@@ -7,7 +7,7 @@
   "repository": "pillarjs/finalhandler",
   "type": "commonjs",
   "main": "index.js",
-  "types": "types/index.d.ts",
+  "types": "index.d.ts",
   "dependencies": {
     "debug": "^4.4.0",
     "encodeurl": "^2.0.0",
