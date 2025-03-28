@@ -22,7 +22,7 @@ $ npm install finalhandler
 ## API
 
 ```js
-var finalhandler = require('finalhandler')
+const finalhandler = require('finalhandler')
 ```
 
 ### finalhandler(req, res, [options])
@@ -60,11 +60,11 @@ as `onerror(err, req, res)`.
 ### always 404
 
 ```js
-var finalhandler = require('finalhandler')
-var http = require('http')
+const finalhandler = require('finalhandler')
+const http = require('http')
 
-var server = http.createServer(function (req, res) {
-  var done = finalhandler(req, res)
+const server = http.createServer((req, res) => {
+  const done = finalhandler(req, res)
   done()
 })
 
@@ -74,14 +74,14 @@ server.listen(3000)
 ### perform simple action
 
 ```js
-var finalhandler = require('finalhandler')
-var fs = require('fs')
-var http = require('http')
+const finalhandler = require('finalhandler')
+const fs = require('fs')
+const http = require('http')
 
-var server = http.createServer(function (req, res) {
-  var done = finalhandler(req, res)
+const server = http.createServer((req, res) => {
+  const done = finalhandler(req, res)
 
-  fs.readFile('index.html', function (err, buf) {
+  fs.readFile('index.html', (err, buf) => {
     if (err) return done(err)
     res.setHeader('Content-Type', 'text/html')
     res.end(buf)
@@ -94,14 +94,14 @@ server.listen(3000)
 ### use with middleware-style functions
 
 ```js
-var finalhandler = require('finalhandler')
-var http = require('http')
-var serveStatic = require('serve-static')
+const finalhandler = require('finalhandler')
+const http = require('http')
+const serveStatic = require('serve-static')
 
-var serve = serveStatic('public')
+const serve = serveStatic('public')
 
-var server = http.createServer(function (req, res) {
-  var done = finalhandler(req, res)
+const server = http.createServer((req, res) => {
+  const done = finalhandler(req, res)
   serve(req, res, done)
 })
 
@@ -111,14 +111,14 @@ server.listen(3000)
 ### keep log of all errors
 
 ```js
-var finalhandler = require('finalhandler')
-var fs = require('fs')
-var http = require('http')
+const finalhandler = require('finalhandler')
+const fs = require('fs')
+const http = require('http')
 
-var server = http.createServer(function (req, res) {
-  var done = finalhandler(req, res, { onerror: logerror })
+const server = http.createServer((req, res) => {
+  const done = finalhandler(req, res, { onerror: logerror })
 
-  fs.readFile('index.html', function (err, buf) {
+  fs.readFile('index.html', (err, buf) => {
     if (err) return done(err)
     res.setHeader('Content-Type', 'text/html')
     res.end(buf)
