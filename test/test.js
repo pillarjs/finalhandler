@@ -297,6 +297,28 @@ var topDescribe = function (type, createServer) {
       test.write(buf)
       test.expect(404, done)
     })
+
+    describe('when HTML acceptable', function () {
+      it('should respond with HTML', function (done) {
+        var server = createServer()
+        wrapper(request(server)
+          .get('/foo'))
+          .set('Accept', 'text/html')
+          .expect('Content-Type', 'text/html; charset=utf-8')
+          .expect(404, /<html/, done)
+      })
+    })
+
+    describe('when HTML not acceptable', function () {
+      it('should respond with plain text', function (done) {
+        var server = createServer()
+        wrapper(request(server)
+          .get('/foo'))
+          .set('Accept', 'application/x-bogus')
+          .expect('Content-Type', 'text/plain; charset=utf-8')
+          .expect(404, 'Cannot GET /foo\n', done)
+      })
+    })
   })
 
   describe('error response', function () {
@@ -392,6 +414,28 @@ var topDescribe = function (type, createServer) {
         test.write(buf)
         test.write(buf)
         test.expect(500, done)
+      })
+    })
+
+    describe('when HTML acceptable', function () {
+      it('should respond with HTML', function (done) {
+        var server = createServer(createError('boom!'))
+        wrapper(request(server)
+          .get('/foo'))
+          .set('Accept', 'text/html')
+          .expect('Content-Type', 'text/html; charset=utf-8')
+          .expect(500, /<html/, done)
+      })
+    })
+
+    describe('when HTML not acceptable', function () {
+      it('should respond with plain text', function (done) {
+        var server = createServer(createError('boom!'), { env: 'production' })
+        wrapper(request(server)
+          .get('/foo'))
+          .set('Accept', 'application/x-bogus')
+          .expect('Content-Type', 'text/plain; charset=utf-8')
+          .expect(500, 'Internal Server Error\n', done)
       })
     })
 
