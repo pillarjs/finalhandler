@@ -14,16 +14,10 @@
 var debug = require('debug')('finalhandler')
 var encodeUrl = require('encodeurl')
 var escapeHtml = require('escape-html')
-var onFinished = require('on-finished')
+const { finished } = require('stream')
+var isFinished = require('on-finished').isFinished
 var parseUrl = require('parseurl')
 var statuses = require('statuses')
-
-/**
- * Module variables.
- * @private
- */
-
-var isFinished = onFinished.isFinished
 
 /**
  * Create a minimal HTML document.
@@ -288,6 +282,6 @@ function send (req, res, status, headers, message) {
   req.unpipe()
 
   // flush the request
-  onFinished(req, write)
+  finished(req, write)
   req.resume()
 }
