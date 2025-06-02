@@ -5,6 +5,10 @@
   "author": "Douglas Christopher Wilson <doug@somethingdoug.com>",
   "license": "MIT",
   "repository": "pillarjs/finalhandler",
+  "funding": {
+    "type": "opencollective",
+    "url": "https://opencollective.com/express"
+  },
   "dependencies": {
     "debug": "^4.4.0",
     "encodeurl": "^2.0.0",
