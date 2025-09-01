@@ -1,3 +1,8 @@
+unreleased
+==========
+
+  * feat: add `text/plain` fallback response
+
 v2.1.0 / 2025-03-05
 ==================
 
