@@ -1,3 +1,9 @@
+unreleased
+==================
+
+  * deps: use tilde notation for dependencies
+  * deps: statuses@~2.0.2
+
 v1.3.1 / 2024-09-11
 ==================
 
