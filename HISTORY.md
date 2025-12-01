@@ -1,7 +1,8 @@
-UNRELEASED
+v2.1.1. / 2025-12-01
 ==================
 
 * update engines field in the package.json to reflect the current compatibility (Node <18). See: 2.0.0
+* Minor changes (package metadata)
 
 v2.1.0 / 2025-03-05
 ==================
