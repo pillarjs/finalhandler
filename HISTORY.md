@@ -27,6 +27,12 @@ v2.0.0 / 2024-09-02
   * drop support for node <18
   * ignore status message for HTTP/2 (#53) 
 
+v1.3.2 / 2025-12-01
+==================
+
+  * deps: use tilde notation for dependencies
+  * deps: statuses@~2.0.2
+
 v1.3.1 / 2024-09-11
 ==================
 
