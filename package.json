@@ -30,8 +30,6 @@
     "supertest": "^7.0.0"
   },
   "files": [
-    "LICENSE",
-    "HISTORY.md",
     "index.js"
   ],
   "engines": {
