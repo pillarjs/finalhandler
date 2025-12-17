@@ -11,6 +11,7 @@
  * @private
  */
 
+const Negotiator = require('negotiator')
 var debug = require('debug')('finalhandler')
 var encodeUrl = require('encodeurl')
 var escapeHtml = require('escape-html')
@@ -25,6 +26,9 @@ var statuses = require('statuses')
 
 var isFinished = onFinished.isFinished
 
+const HTML_CONTENT_TYPE = 'text/html; charset=utf-8'
+const TEXT_CONTENT_TYPE = 'text/plain; charset=utf-8'
+
 /**
  * Create a minimal HTML document.
  *
@@ -32,21 +36,24 @@ var isFinished = onFinished.isFinished
  * @private
  */
 
-function createHtmlDocument (message) {
-  var body = escapeHtml(message)
+function createHtmlBody (message) {
+  const msg = escapeHtml(message)
     .replaceAll('\n', '<br>')
     .replaceAll('  ', ' &nbsp;')
 
-  return '<!DOCTYPE html>\n' +
-    '<html lang="en">\n' +
-    '<head>\n' +
-    '<meta charset="utf-8">\n' +
-    '<title>Error</title>\n' +
-    '</head>\n' +
-    '<body>\n' +
-    '<pre>' + body + '</pre>\n' +
-    '</body>\n' +
-    '</html>\n'
+  const html = `<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Error</title>
+</head>
+<body>
+<pre>${msg}</pre>
+</body>
+</html>
+`
+
+  return Buffer.from(html, 'utf8')
 }
 
 /**
@@ -74,6 +81,9 @@ function finalhandler (req, res, options) {
 
   // get error callback
   var onerror = opts.onerror
+
+  // fallback response content type negotiation enabled
+  const contentTypeNegotiation = opts.contentTypeNegotiation === true
 
   return function (err) {
     var headers
@@ -123,8 +133,33 @@ function finalhandler (req, res, options) {
       return
     }
 
+    let body
+    let contentType
+    // If text/plain fallback is enabled, negotiate content type
+    if (contentTypeNegotiation) {
+      // negotiate
+      const negotiator = new Negotiator(req)
+      const type = negotiator.mediaType(['text/plain', 'text/html'])
+
+      // construct body
+      switch (type) {
+        case 'text/html':
+          body = createHtmlBody(msg)
+          contentType = HTML_CONTENT_TYPE
+          break
+        default:
+          // default to plain text
+          body = Buffer.from(msg, 'utf8')
+          contentType = TEXT_CONTENT_TYPE
+          break
+      }
+    } else {
+      body = createHtmlBody(msg)
+      contentType = HTML_CONTENT_TYPE
+    }
+
     // send response
-    send(req, res, status, headers, msg)
+    send(req, res, status, headers, body, contentType)
   }
 }
 
@@ -241,11 +276,8 @@ function getResponseStatusCode (res) {
  * @private
  */
 
-function send (req, res, status, headers, message) {
+function send (req, res, status, headers, body, contentType) {
   function write () {
-    // response body
-    var body = createHtmlDocument(message)
-
     // response status
     res.statusCode = status
 
@@ -268,8 +300,8 @@ function send (req, res, status, headers, message) {
     res.setHeader('X-Content-Type-Options', 'nosniff')
 
     // standard headers
-    res.setHeader('Content-Type', 'text/html; charset=utf-8')
-    res.setHeader('Content-Length', Buffer.byteLength(body, 'utf8'))
+    res.setHeader('Content-Type', contentType)
+    res.setHeader('Content-Length', body.length)
 
     if (req.method === 'HEAD') {
       res.end()
