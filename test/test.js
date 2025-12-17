@@ -15,6 +15,41 @@ var shouldHaveStatusMessage = utils.shouldHaveStatusMessage
 var shouldNotHaveBody = utils.shouldNotHaveBody
 var shouldNotHaveHeader = utils.shouldNotHaveHeader
 
+describe('options.defaultContentType', function () {
+  it('should accept "text/html" or "text/plain"', function () {
+    assert.doesNotThrow(function () {
+      finalhandler({}, {}, { defaultContentType: 'text/html' })
+    })
+    assert.doesNotThrow(function () {
+      finalhandler({}, {}, { defaultContentType: 'text/plain' })
+    })
+  })
+
+  it('should accept null or undefined', function () {
+    assert.doesNotThrow(function () {
+      finalhandler({}, {}, { defaultContentType: null })
+    })
+    assert.doesNotThrow(function () {
+      finalhandler({}, {}, { defaultContentType: undefined })
+    })
+  })
+
+  it('should throw when invalid value is used', function () {
+    assert.throws(function () {
+      finalhandler({}, {}, { defaultContentType: 'application/json' })
+    })
+    assert.throws(function () {
+      finalhandler({}, {}, { defaultContentType: 1234 })
+    })
+    assert.throws(function () {
+      finalhandler({}, {}, { defaultContentType: true })
+    })
+    assert.throws(function () {
+      finalhandler({}, {}, { defaultContentType: { foo: 'bar' } })
+    })
+  })
+})
+
 var topDescribe = function (type, createServer) {
   var wrapper = function wrapper (req) {
     if (type === 'http2') {
@@ -356,9 +391,18 @@ var topDescribe = function (type, createServer) {
       })
     })
 
-    describe('when HTML not acceptable', function () {
-      it('should respond with plain text when contentTypeNegotiation is true', function (done) {
+    describe('when neither text/html nor text/plain acceptable', function () {
+      it('should respond with HTML when contentTypeNegotiation is true', function (done) {
         var server = createServer(null, { contentTypeNegotiation: true })
+        wrapper(request(server)
+          .get('/foo'))
+          .set('Accept', 'application/x-bogus')
+          .expect('Content-Type', 'text/html; charset=utf-8')
+          .expect(404, /<html/, done)
+      })
+
+      it('should respond with plain text when contentTypeNegotiation is true and defaultContentType is text/plain', function (done) {
+        var server = createServer(null, { contentTypeNegotiation: true, defaultContentType: 'text/plain' })
         wrapper(request(server)
           .get('/foo'))
           .set('Accept', 'application/x-bogus')
@@ -586,9 +630,18 @@ var topDescribe = function (type, createServer) {
       })
     })
 
-    describe('when HTML not acceptable', function () {
-      it('should respond with plain text when contentTypeNegotiation is true', function (done) {
-        var server = createServer(createError('boom!'), { env: 'production', contentTypeNegotiation: true })
+    describe('when neither text/html nor text/plain acceptable', function () {
+      it('should respond with HTML when contentTypeNegotiation is true', function (done) {
+        var server = createServer(createError('boom!'), { contentTypeNegotiation: true })
+        wrapper(request(server)
+          .get('/foo'))
+          .set('Accept', 'application/x-bogus')
+          .expect('Content-Type', 'text/html; charset=utf-8')
+          .expect(500, /<html/, done)
+      })
+
+      it('should respond with plain text when contentTypeNegotiation is true and defaultContentType is text/plain', function (done) {
+        var server = createServer(createError('boom!'), { env: 'production', contentTypeNegotiation: true, defaultContentType: 'text/plain' })
         wrapper(request(server)
           .get('/foo'))
           .set('Accept', 'application/x-bogus')
@@ -597,7 +650,7 @@ var topDescribe = function (type, createServer) {
       })
 
       it('should respond with HTML when contentTypeNegotiation is false', function (done) {
-        var server = createServer(createError('boom!'), { env: 'production', contentTypeNegotiation: false })
+        var server = createServer(createError('boom!'), { contentTypeNegotiation: false })
         wrapper(request(server)
           .get('/foo'))
           .set('Accept', 'application/x-bogus')
@@ -606,7 +659,7 @@ var topDescribe = function (type, createServer) {
       })
 
       it('should respond with HTML when contentTypeNegotiation is not set', function (done) {
-        var server = createServer(createError('boom!'), { env: 'production' })
+        var server = createServer(createError('boom!'))
         wrapper(request(server)
           .get('/foo'))
           .set('Accept', 'application/x-bogus')

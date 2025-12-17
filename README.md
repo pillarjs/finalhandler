@@ -64,6 +64,14 @@ to `false`.
 > [!WARNING]  
 > This will be enabled by default in the next major version.
 
+#### options.defaultContentType
+
+The fallback content type for responses when content negotiation is disabled or no preferred type can be determined. 
+Allowed Values are `text/html` or `text/plain`. Defaults to `text/html`. 
+
+> [!WARNING]  
+> The default will be changed to `text/plain` in the next major version.
+
 ## Examples
 
 ### always 404

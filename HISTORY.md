@@ -3,6 +3,7 @@ unreleased
 
   * feat: add `contentTypeNegotiation` option which enables `text/plain` and `text/html`
     responses based on the `Accept` header
+  * feat: add `defaultContentType` option to configure the default response content type
 
 v2.1.1. / 2025-12-01
 ==================

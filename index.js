@@ -26,6 +26,7 @@ var statuses = require('statuses')
 
 var isFinished = onFinished.isFinished
 
+const AVAILABLE_MEDIA_TYPES = ['text/plain', 'text/html']
 const HTML_CONTENT_TYPE = 'text/html; charset=utf-8'
 const TEXT_CONTENT_TYPE = 'text/plain; charset=utf-8'
 
@@ -85,6 +86,12 @@ function finalhandler (req, res, options) {
   // fallback response content type negotiation enabled
   const contentTypeNegotiation = opts.contentTypeNegotiation === true
 
+  // default content type for responses
+  const defaultContentType = opts.defaultContentType || 'text/html'
+  if (!AVAILABLE_MEDIA_TYPES.includes(defaultContentType)) {
+    throw new Error('defaultContentType must be one of: ' + AVAILABLE_MEDIA_TYPES.join(', '))
+  }
+
   return function (err) {
     var headers
     var msg
@@ -133,29 +140,27 @@ function finalhandler (req, res, options) {
       return
     }
 
-    let body
-    let contentType
+    let preferredType
     // If text/plain fallback is enabled, negotiate content type
     if (contentTypeNegotiation) {
       // negotiate
       const negotiator = new Negotiator(req)
-      const type = negotiator.mediaType(['text/plain', 'text/html'])
+      preferredType = negotiator.mediaType(AVAILABLE_MEDIA_TYPES)
+    }
 
-      // construct body
-      switch (type) {
-        case 'text/html':
-          body = createHtmlBody(msg)
-          contentType = HTML_CONTENT_TYPE
-          break
-        default:
-          // default to plain text
-          body = Buffer.from(msg, 'utf8')
-          contentType = TEXT_CONTENT_TYPE
-          break
-      }
-    } else {
-      body = createHtmlBody(msg)
-      contentType = HTML_CONTENT_TYPE
+    // construct body
+    let body
+    let contentType
+    switch (preferredType || defaultContentType) {
+      case 'text/html':
+        body = createHtmlBody(msg)
+        contentType = HTML_CONTENT_TYPE
+        break
+      case 'text/plain':
+        // default to plain text
+        body = Buffer.from(msg, 'utf8')
+        contentType = TEXT_CONTENT_TYPE
+        break
     }
 
     // send response
