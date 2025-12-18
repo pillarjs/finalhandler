@@ -55,6 +55,23 @@ Provide a function to be called with the `err` when it exists. Can be used for
 writing errors to a central location without excessive function generation. Called
 as `onerror(err, req, res)`.
 
+#### options.contentTypeNegotiation
+
+Enables content type negotiation based on the `Accept` header. When enabled, error
+responses will use `text/plain` or `text/html` based on the client's preferences. Defaults
+to `false`.
+
+> [!WARNING]  
+> This will be enabled by default in the next major version.
+
+#### options.defaultContentType
+
+The fallback content type for responses when content negotiation is disabled or no preferred type can be determined. 
+Allowed Values are `text/html` or `text/plain`. Defaults to `text/html`. 
+
+> [!WARNING]  
+> The default will be changed to `text/plain` in the next major version.
+
 ## Examples
 
 ### always 404
