@@ -1,28 +1,23 @@
-var assert = require('assert')
-var finalhandler = require('../..')
-var http = require('http')
-var http2 = require('http2')
+const finalhandler = require('../..')
+const SlowWriteStream = require('./sws')
 
-var request = require('supertest')
-var SlowWriteStream = require('./sws')
+const assert = require('node:assert')
+const http = require('node:http')
+const http2 = require('node:http2')
+const supertest = require('supertest')
 
-exports.assert = assert
 exports.createError = createError
-exports.createHTTPServer = createHTTPServer
-exports.createHTTP2Server = createHTTP2Server
-exports.createSlowWriteStream = createSlowWriteStream
-exports.rawrequest = rawrequest
-exports.rawrequestHTTP2 = rawrequestHTTP2
-exports.request = request
+exports.getTestHelpers = getTestHelpers
+exports.SlowWriteStream = SlowWriteStream
 exports.shouldHaveStatusMessage = shouldHaveStatusMessage
 exports.shouldNotHaveBody = shouldNotHaveBody
 exports.shouldNotHaveHeader = shouldNotHaveHeader
 
 function createError (message, props) {
-  var err = new Error(message)
+  const err = new Error(message)
 
   if (props) {
-    for (var prop in props) {
+    for (const prop in props) {
       err[prop] = props[prop]
     }
   }
@@ -30,39 +25,29 @@ function createError (message, props) {
   return err
 }
 
-function createHTTPServer (err, opts) {
-  return http.createServer(function (req, res) {
-    var done = finalhandler(req, res, opts)
+function getTestHelpers (type) {
+  const { createServer } = type === 'http2' ? http2 : http
 
-    if (typeof err === 'function') {
-      err(req, res, done)
-      return
-    }
+  return {
+    createServer: (err, opts) =>
+      createServer((req, res) => {
+        const done = finalhandler(req, res, opts)
 
-    done(err)
-  })
-}
+        if (typeof err === 'function') {
+          err(req, res, done)
+          return
+        }
 
-function createHTTP2Server (err, opts) {
-  return http2.createServer(function (req, res) {
-    var done = finalhandler(req, res, opts)
-
-    if (typeof err === 'function') {
-      err(req, res, done)
-      return
-    }
-
-    done(err)
-  })
-}
-
-function createSlowWriteStream () {
-  return new SlowWriteStream()
+        done(err)
+      }),
+    request: (server, options) => supertest(server, { ...options, http2: type === 'http2' }),
+    rawrequest: type === 'http2' ? rawrequestHTTP2 : rawrequest
+  }
 }
 
 function rawrequest (server) {
-  var _headers = {}
-  var _path
+  const _headers = {}
+  let _path
 
   function expect (status, body, callback) {
     if (arguments.length === 2) {
@@ -71,25 +56,25 @@ function rawrequest (server) {
     }
 
     server.listen(function onlisten () {
-      var addr = this.address()
-      var port = addr.port
+      const addr = this.address()
+      const port = addr.port
 
-      var req = http.get({
+      const req = http.get({
         host: '127.0.0.1',
         path: _path,
         port: port
       })
       req.on('error', callback)
       req.on('response', function onresponse (res) {
-        var buf = ''
+        let buf = ''
 
         res.setEncoding('utf8')
-        res.on('data', function ondata (s) { buf += s })
-        res.on('end', function onend () {
-          var err = null
+        res.on('data', (s) => { buf += s })
+        res.on('end', () => {
+          let err = null
 
           try {
-            for (var key in _headers) {
+            for (const key in _headers) {
               assert.strictEqual(res.headers[key], _headers[key])
             }
 
@@ -111,22 +96,18 @@ function rawrequest (server) {
     })
   }
 
-  function get (path) {
-    _path = path
-
-    return {
-      expect: expect
-    }
-  }
-
   return {
-    get: get
+    get: (path) => {
+      _path = path
+
+      return { expect }
+    }
   }
 }
 
 function rawrequestHTTP2 (server) {
-  var _headers = {}
-  var _path
+  const _headers = {}
+  let _path
 
   function expect (status, body, callback) {
     if (arguments.length === 2) {
@@ -135,26 +116,24 @@ function rawrequestHTTP2 (server) {
     }
 
     server.listen(function onlisten () {
-      var buf = ''
-      var resHeaders
-      var addr = this.address()
-      var port = addr.port
+      let buf = ''
+      let resHeaders
+      const addr = this.address()
+      const port = addr.port
 
-      var client = http2.connect('http://127.0.0.1:' + port)
-      var req = client.request({
+      const client = http2.connect('http://127.0.0.1:' + port)
+      const req = client.request({
         ':method': 'GET',
         ':path': _path.replace(/http:\/\/localhost/, '')
       })
       req.on('error', callback)
-      req.on('response', function onresponse (responseHeaders) {
-        resHeaders = responseHeaders
-      })
-      req.on('data', function ondata (s) { buf += s })
-      req.on('end', function onend () {
-        var err = null
+      req.on('response', (responseHeaders) => { resHeaders = responseHeaders })
+      req.on('data', (s) => { buf += s })
+      req.on('end', () => {
+        let err = null
 
         try {
-          for (var key in _headers) {
+          for (const key in _headers) {
             assert.strictEqual(resHeaders[key], _headers[key])
           }
 
@@ -177,33 +156,29 @@ function rawrequestHTTP2 (server) {
     })
   }
 
-  function get (path) {
-    _path = path
-
-    return {
-      expect: expect
-    }
-  }
-
   return {
-    get: get
+    get: (path) => {
+      _path = path
+
+      return { expect }
+    }
   }
 }
 
 function shouldHaveStatusMessage (statusMessage) {
-  return function (test) {
+  return (test) => {
     assert.strictEqual(test.res.statusMessage, statusMessage, 'should have statusMessage "' + statusMessage + '"')
   }
 }
 
 function shouldNotHaveBody () {
-  return function (res) {
+  return (res) => {
     assert.ok(res.text === '' || res.text === undefined)
   }
 }
 
 function shouldNotHaveHeader (header) {
-  return function (test) {
+  return (test) => {
     assert.ok(test.res.headers[header] === undefined, 'response does not have header "' + header + '"')
   }
 }
