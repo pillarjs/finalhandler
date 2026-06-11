@@ -351,6 +351,34 @@ var topDescribe = function (type, createServer) {
         .expect(501, /<pre>Not Implemented<\/pre>/, done)
     })
 
+    it('should send exposed error message when production', function (done) {
+      var err = createError('missing id', {
+        expose: true,
+        status: 400
+      })
+      wrapper(request(createServer(err, {
+        env: 'production'
+      }))
+        .get('/foo'))
+        .expect(400, /<pre>missing id<\/pre>/, done)
+    })
+
+    it('should hide unexposed error message when production', function (done) {
+      var err = createError('secret failure', {
+        expose: false,
+        status: 400
+      })
+      wrapper(request(createServer(err, {
+        env: 'production'
+      }))
+        .get('/foo'))
+        .expect(400, /<pre>Bad Request<\/pre>/)
+        .expect(function (res) {
+          assert.strictEqual(res.text.indexOf('secret failure'), -1)
+        })
+        .end(done)
+    })
+
     describe('when there is a request body', function () {
       it('should not hang/error when unread', function (done) {
         var buf = Buffer.alloc(1024 * 16, '.')
