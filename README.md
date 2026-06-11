@@ -39,7 +39,8 @@ When an error is written, the following information is added to the response:
     this value is outside the 4xx or 5xx range, it will be set to 500.
   * The `res.statusMessage` is set according to the status code.
   * The body will be the HTML of the status code message if `env` is
-    `'production'`, otherwise will be `err.stack`.
+    `'production'`, unless `err.expose` is true and `err.message` is set.
+    In other environments, the body will be `err.stack`.
   * Any headers specified in an `err.headers` object.
 
 The final handler will also unpipe anything from `req` when it is invoked.

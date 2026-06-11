@@ -165,6 +165,9 @@ function getErrorMessage (err, status, env) {
     if (!msg && typeof err.toString === 'function') {
       msg = err.toString()
     }
+  } else if (err.expose && typeof err.message === 'string') {
+    // use exposed error messages in production
+    msg = err.message
   }
 
   return msg || statuses.message[status]
