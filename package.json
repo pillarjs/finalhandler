@@ -42,5 +42,9 @@
     "test-ci": "nyc --reporter=lcovonly --reporter=text npm test",
     "test-cov": "nyc --reporter=html --reporter=text npm test",
     "test-inspect": "mocha --reporter spec --inspect --inspect-brk test/"
+  },
+  "homepage": "https://github.com/pillarjs/finalhandler",
+  "bugs": {
+    "url": "https://github.com/pillarjs/finalhandler/issues"
   }
 }
