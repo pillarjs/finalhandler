@@ -525,6 +525,22 @@ var topDescribe = function (type, createServer) {
   })
 
   describe('request started', function () {
+    it('should not respond after headers are sent while flushing the request', function (done) {
+      var buf = Buffer.alloc(1024 * 16, '.')
+      var server = createServer(function (req, res) {
+        var final = finalhandler(req, res)
+
+        final()
+        final()
+      })
+
+      var test = wrapper(request(server).post('/foo'))
+      test.write(buf)
+      test.write(buf)
+      test.write(buf)
+      test.expect(404, done)
+    })
+
     it('should not respond', function (done) {
       var server = createServer(function (req, res) {
         var done = finalhandler(req, res)
