@@ -526,19 +526,14 @@ var topDescribe = function (type, createServer) {
 
   describe('request started', function () {
     it('should not respond after headers are sent while flushing the request', function (done) {
-      var buf = Buffer.alloc(1024 * 16, '.')
       var server = createServer(function (req, res) {
-        var final = finalhandler(req, res)
-
-        final()
-        final()
+        finalhandler(req, res)()
+        res.end('respond not by finalhandler')
       })
 
-      var test = wrapper(request(server).post('/foo'))
-      test.write(buf)
-      test.write(buf)
-      test.write(buf)
-      test.expect(404, done)
+      wrapper(request(server)
+        .post('/foo'))
+        .expect(200, 'respond not by finalhandler', done)
     })
 
     it('should not respond', function (done) {
