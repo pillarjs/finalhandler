@@ -243,6 +243,10 @@ function getResponseStatusCode (res) {
 
 function send (req, res, status, headers, message) {
   function write () {
+    if (res.headersSent) {
+      return
+    }
+
     // response body
     var body = createHtmlDocument(message)
 

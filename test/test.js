@@ -393,6 +393,34 @@ var topDescribe = function (type, createServer) {
         test.write(buf)
         test.expect(500, done)
       })
+
+      it('should not throw if headers are sent while waiting for request', function (done) {
+        var buf = Buffer.alloc(1024 * 16, '.')
+        var server = createServer(function (req, res, next) {
+          next()
+          res.setHeader('Content-Type', 'text/plain')
+          res.end('ok')
+        })
+        var test = wrapper(request(server).post('/foo'))
+        test.write(buf)
+        test.write(buf)
+        test.write(buf)
+        test.expect(200, 'ok', done)
+      })
+
+      it('should not throw if headers are sent while waiting for request on error', function (done) {
+        var buf = Buffer.alloc(1024 * 16, '.')
+        var server = createServer(function (req, res, next) {
+          next(new Error('boom!'))
+          res.setHeader('Content-Type', 'text/plain')
+          res.end('error response')
+        })
+        var test = wrapper(request(server).post('/foo'))
+        test.write(buf)
+        test.write(buf)
+        test.write(buf)
+        test.expect(200, 'error response', done)
+      })
     })
 
     describe('when res.statusCode set', function () {
