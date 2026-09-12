@@ -662,6 +662,52 @@ var topDescribe = function (type, createServer) {
   })
 }
 
+describe('with optimizeEmptyRequests', function () {
+  function requestFinalhandler (method, callback) {
+    var server = http.createServer({ optimizeEmptyRequests: true }, function (req, res) {
+      finalhandler(req, res)()
+    })
+
+    server.listen(0, function () {
+      var port = this.address().port
+      var settled = false
+      var finish = function (err, statusCode) {
+        if (settled) return
+        settled = true
+        server.close()
+        callback(err, statusCode)
+      }
+
+      var req = http.request({ host: '127.0.0.1', port: port, path: '/foo', method: method }, function (res) {
+        res.resume()
+        res.on('end', function () { finish(null, res.statusCode) })
+      })
+      req.on('error', finish)
+      req.setTimeout(1000, function () {
+        req.destroy()
+        finish(new Error('finalhandler never sent a response (on-finished did not fire for the dumped request)'))
+      })
+      req.end()
+    })
+  }
+
+  it('should still send a 404 for a body-less GET request', function (done) {
+    requestFinalhandler('GET', function (err, statusCode) {
+      if (err) return done(err)
+      assert.strictEqual(statusCode, 404)
+      done()
+    })
+  })
+
+  it('should still send a 404 for a body-less HEAD request', function (done) {
+    requestFinalhandler('HEAD', function (err, statusCode) {
+      if (err) return done(err)
+      assert.strictEqual(statusCode, 404)
+      done()
+    })
+  })
+})
+
 var servers = [
   ['http', createHTTPServer],
   ['http2', createHTTP2Server]
