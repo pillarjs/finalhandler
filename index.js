@@ -259,7 +259,7 @@ function send (req, res, status, headers, message) {
     res.removeHeader('Content-Range')
 
     // response headers
-    if( typeof headers === 'object' ){
+    if (typeof headers === 'object') {
       for (const [key, value] of Object.entries(headers)) {
         res.setHeader(key, value)
       }
