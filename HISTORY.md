@@ -1,6 +1,7 @@
 unreleased
 ==================
 
+  * Prevent writing a response after headers are sent while flushing the request
   * deps: 
     * debug@^4.4.3
     * statuses@^2.0.2
