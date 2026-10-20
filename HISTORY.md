@@ -1,6 +1,7 @@
 unreleased
 ==================
 
+  * fix: use the status code as the error body when it has no name
   * deps: 
     * debug@^4.4.3
     * statuses@^2.0.2
