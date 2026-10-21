@@ -28,7 +28,7 @@
     "eslint-plugin-standard": "^4.1.0",
     "mocha": "^11.0.1",
     "nyc": "^17.1.0",
-    "supertest": "^7.0.0"
+    "supertest": "7.3.0"
   },
   "files": [
     "index.js"

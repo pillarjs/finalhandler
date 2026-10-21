@@ -167,7 +167,7 @@ function getErrorMessage (err, status, env) {
     }
   }
 
-  return msg || statuses.message[status]
+  return msg || statuses.message[status] || String(status)
 }
 
 /**
@@ -264,8 +264,10 @@ function send (req, res, status, headers, message) {
     res.removeHeader('Content-Range')
 
     // response headers
-    for (const [key, value] of Object.entries(headers ?? {})) {
-      res.setHeader(key, value)
+    if (headers) {
+      for (const [key, value] of Object.entries(headers)) {
+        res.setHeader(key, value)
+      }
     }
 
     // security headers

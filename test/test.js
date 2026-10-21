@@ -351,6 +351,17 @@ var topDescribe = function (type, createServer) {
         .expect(501, /<pre>Not Implemented<\/pre>/, done)
     })
 
+    it('should send status code when production and no status code name', function (done) {
+      var err = createError('boom!', {
+        status: 499
+      })
+      wrapper(request(createServer(err, {
+        env: 'production'
+      }))
+        .get('/foo'))
+        .expect(499, /<pre>499<\/pre>/, done)
+    })
+
     describe('when there is a request body', function () {
       it('should not hang/error when unread', function (done) {
         var buf = Buffer.alloc(1024 * 16, '.')

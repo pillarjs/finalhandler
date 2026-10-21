@@ -1,7 +1,8 @@
 unreleased
 ==================
 
-  * Prevent writing a response after headers are sent while flushing the request
+  * fix: prevent writing a response after headers are sent while flushing the request
+  * fix: use the status code as the error body when it has no name
   * deps: 
     * debug@^4.4.3
     * statuses@^2.0.2
