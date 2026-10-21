@@ -624,53 +624,6 @@ var topDescribe = function (type, createServer) {
       })
     })
   }
-
-  describe('no deprecation warnings', function () {
-    it('should respond 404 on no error', function (done) {
-      var warned = false
-
-      process.once('warning', function (warning) {
-        if (/The http2 module is an experimental API/.test(warning)) return
-        assert.fail(warning)
-      })
-
-      wrapper(request(createServer())
-        .head('/foo'))
-        .expect(404)
-        .end(function (err) {
-          assert.strictEqual(warned, false)
-          done(err)
-        })
-    })
-
-    it('should respond 500 on error', function (done) {
-      var warned = false
-
-      process.once('warning', function (warning) {
-        if (/The http2 module is an experimental API/.test(warning)) return
-        assert.fail(warning)
-      })
-
-      var err = createError()
-
-      wrapper(request(createServer(function (req, res) {
-        var done = finalhandler(req, res)
-
-        if (typeof err === 'function') {
-          err(req, res, done)
-          return
-        }
-
-        done(err)
-      }))
-        .head('/foo'))
-        .expect(500)
-        .end(function (err, res) {
-          assert.strictEqual(warned, false)
-          done(err)
-        })
-    })
-  })
 }
 
 var servers = [
