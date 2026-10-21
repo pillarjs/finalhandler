@@ -167,7 +167,7 @@ function getErrorMessage (err, status, env) {
     }
   }
 
-  return msg || statuses.message[status]
+  return msg || statuses.message[status] || String(status)
 }
 
 /**
