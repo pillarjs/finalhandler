@@ -243,6 +243,12 @@ function getResponseStatusCode (res) {
 
 function send (req, res, status, headers, message) {
   function write () {
+    // cannot actually respond
+    if (res.headersSent) {
+      debug('cannot respond after headers sent')
+      return
+    }
+
     // response body
     var body = createHtmlDocument(message)
 
