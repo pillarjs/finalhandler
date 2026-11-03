@@ -300,6 +300,21 @@ var topDescribe = function (type, createServer) {
   })
 
   describe('error response', function () {
+    it('should leave the response unchanged when headers are sent while waiting for the request', function (done) {
+      var buf = Buffer.alloc(1024 * 1024, '.')
+      var server = createServer(function (req, res, final) {
+        final(createError('oops!'))
+
+        // send the response while finalhandler waits for the request body
+        res.writeHead(200, { 'Content-Type': 'text/plain' })
+        res.end('sent by middleware')
+      })
+      var test = wrapper(request(server).post('/foo'))
+      test.write(buf)
+      test.write(buf)
+      test.expect(200, 'sent by middleware', done)
+    })
+
     it('should include error stack', function (done) {
       wrapper(request(createServer(createError('boom!')))
         .get('/foo'))
